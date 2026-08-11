@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claucia Estética - Painel</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Cormorant Garamond"', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            gold: {
+              300: '#E5C158',
+              400: '#C5A028',
+              500: '#A38118',
+            },
+            bege: {
+              100: '#F7F3EE',
+              200: '#EFE7DD',
+              300: '#E3D5C5'
+            },
+            sidebar: '#120F0D'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #aa9a81 0%, #a58d63 50%, #a37f06 100%);
+      background-attachment: fixed;
+    }
+    .titulo-secao {
+      color: #000000;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.4);
+    }
+    .nota-adicional {
+      color: #92400e;
+      font-weight: 600;
+      background-color: #fef3c7;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border-left: 3px solid #d97706;
+      display: block;
+      margin-top: 4px;
+    }
+    .orcamentos-frame {
+      width: 100%;
+      min-height: 1100px;
+      border: 0;
+      border-radius: 1rem;
+      background: #f4f1ea;
+    }
+  </style>
+</head>
+<body class="text-neutral-900 font-sans text-base antialiased min-h-screen flex flex-col md:flex-row selection:bg-gold-300">
+  
+  <div class="md:hidden bg-sidebar text-white p-4 flex justify-between items-center border-b border-neutral-800 shrink-0">
+    <div class="flex items-center gap-2">
+      <span class="text-gold-400 text-xl">✦</span>
+      <h1 class="font-serif text-xl font-semibold tracking-wide text-white">Claucia Estética</h1>
+    </div>
+    <button onclick="toggleMenu()" class="p-2 text-neutral-300 hover:text-white focus:outline-none">
+      <span class="text-2xl">☰</span>
+    </button>
+  </div>
+
+  <aside id="sidebar" class="hidden md:flex w-full md:w-72 bg-sidebar text-white min-h-screen flex-col p-6 border-r border-neutral-800 shrink-0">
+    <div class="hidden md:flex items-center gap-3 mb-10 px-2">
+      <span class="text-gold-400 text-2xl">✦</span>
+      <h1 class="font-serif text-2xl font-semibold tracking-wide text-white">Claucia Estética</h1>
+    </div>
+
+    <nav class="space-y-2 flex-1">
+      <button onclick="mudarAba('painel')" id="tab-painel" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition bg-neutral-800 text-white">
+        <span>📊</span> Painel
+      </button>
+      <button onclick="mudarAba('agenda')" id="tab-agenda" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition text-neutral-400 hover:text-white hover:bg-neutral-800/50">
+        <span>📅</span> Agenda
+      </button>
+      <button onclick="mudarAba('concluidos')" id="tab-concluidos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition text-neutral-400 hover:text-white hover:bg-neutral-800/50">
+        <span>✅</span> Concluídos
+      </button>
+      <button onclick="mudarAba('pacientes')" id="tab-pacientes" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition text-neutral-400 hover:text-white hover:bg-neutral-800/50">
+        <span>👤</span> Pacientes
+      </button>
+      <button onclick="mudarAba('procedimentos')" id="tab-procedimentos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition text-neutral-400 hover:text-white hover:bg-neutral-800/50">
+        <span>✂️</span> Procedimentos
+      </button>
+      <button onclick="mudarAba('produtos')" id="tab-produtos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition text-neutral-400 hover:text-white hover:bg-neutral-800/50">
+        <span>📦</span> Cadastrar Produtos
+      </button>
+      <button onclick="mudarAba('fotos')" id="tab-fotos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition text-neutral-400 hover:text-white hover:bg-neutral-800/50">
+        <span>📸</span> Galeria de Fotos
+      </button>
+      <button onclick="mudarAba('orcamentos')" id="tab-orcamentos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition text-neutral-400 hover:text-white hover:bg-neutral-800/50">
+        <span>📄</span> Gerador de Orçamentos
+      </button>
+    </nav>
+  </aside>
+
+  <div class="flex-1 p-4 sm:p-6 md:p-12 overflow-y-auto w-full">
+
+    <div id="secao-painel" class="space-y-8">
+      <div>
+        <span class="text-xs font-extrabold tracking-widest uppercase bg-black/10 text-neutral-900 px-3 py-1 rounded-full">Painel de Controle</span>
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-serif font-bold titulo-secao mt-2">Olá, Claucia.</h2>
+        <p class="text-sm sm:text-base text-neutral-900 capitalize mt-1 font-semibold" id="data-hoje"></p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div onclick="mudarAba('agenda')" class="bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-2xl border border-amber-200/60 shadow-md flex items-center gap-4 sm:gap-5 cursor-pointer hover:bg-bege-100 hover:scale-[1.02] transition-all duration-200 group">
+          <div class="p-3 sm:p-4 bg-amber-50 group-hover:bg-amber-100 rounded-xl text-gold-400 text-xl sm:text-2xl transition">📅</div>
+          <div>
+            <p class="text-xs font-extrabold tracking-wider text-neutral-600 uppercase">Agendamentos Hoje</p>
+            <p class="text-2xl sm:text-3xl font-serif font-bold text-neutral-900 mt-1" id="metric-hoje">0</p>
+            <span class="text-[11px] font-bold text-gold-500 opacity-0 group-hover:opacity-100 transition">Ver agenda →</span>
+          </div>
+        </div>
+
+        <div onclick="mudarAba('pacientes')" class="bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-2xl border border-amber-200/60 shadow-md flex items-center gap-4 sm:gap-5 cursor-pointer hover:bg-bege-100 hover:scale-[1.02] transition-all duration-200 group">
+          <div class="p-3 sm:p-4 bg-amber-50 group-hover:bg-amber-100 rounded-xl text-gold-400 text-xl sm:text-2xl transition">👤</div>
+          <div>
+            <p class="text-xs font-extrabold tracking-wider text-neutral-600 uppercase">Pacientes Cadastrados</p>
+            <p class="text-2xl sm:text-3xl font-serif font-bold text-neutral-900 mt-1" id="metric-pacientes">0</p>
+            <span class="text-[11px] font-bold text-gold-500 opacity-0 group-hover:opacity-100 transition">Ver pacientes →</span>
+          </div>
+        </div>
+
+        <div class="bg-white/95 backdrop-blur-sm p-4 sm:p-6 rounded-2xl border border-amber-200/60 shadow-md flex flex-col justify-between sm:col-span-2 lg:col-span-1">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="p-3 bg-amber-50 rounded-xl text-gold-400 text-xl">📈</div>
+              <div>
+                <p class="text-xs font-extrabold tracking-wider text-neutral-600 uppercase">Receita Estimada</p>
+                <select id="filtro-periodo-receita" onchange="atualizarTelas()" class="mt-0.5 text-xs font-bold bg-neutral-100 border border-neutral-300 rounded-md px-1.5 py-0.5 text-neutral-800 focus:outline-none">
+                  <option value="hoje">Hoje</option>
+                  <option value="semana">Esta Semana</option>
+                  <option value="mes" selected>Este Mês</option>
+                  <option value="ano">Este Ano</option>
+                </select>
+              </div>
+            </div>
+            <button onclick="toggleOcultarReceita()" title="Ocultar/Mostrar Valor" class="p-2 rounded-xl bg-neutral-100 hover:bg-bege-200 text-neutral-700 transition">
+              <span id="icone-olho" class="text-lg">👁️</span>
+            </button>
+          </div>
+          <div class="mt-3">
+            <p class="text-2xl sm:text-3xl font-serif font-bold text-neutral-900" id="metric-receita">R$ 0,00</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white/95 backdrop-blur-sm p-5 sm:p-8 rounded-2xl border border-amber-200/60 shadow-md">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
+          <h3 class="font-serif text-2xl sm:text-3xl font-bold text-neutral-900">Agenda de hoje</h3>
+          <button onclick="mudarAba('agenda')" class="text-sm text-gold-500 hover:underline font-extrabold">Ver agenda completa →</button>
+        </div>
+
+        <div id="container-agenda-hoje"></div>
+      </div>
+    </div>
+
+    <div id="secao-agenda" class="hidden space-y-8">
+      <div>
+        <span class="text-xs font-extrabold tracking-widest uppercase bg-black/10 text-neutral-900 px-3 py-1 rounded-full">Agendamentos</span>
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-serif font-bold titulo-secao mt-2">Gerenciamento da Agenda</h2>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="bg-white/95 backdrop-blur-sm p-5 sm:p-8 rounded-2xl border border-amber-200/60 shadow-md">
+          <h3 class="font-serif text-2xl font-bold mb-6 text-neutral-900">Novo Agendamento</h3>
+          <form id="form-agendamento" class="space-y-5">
+            <div>
+              <label class="block text-sm font-bold uppercase text-neutral-700 mb-2">Paciente</label>
+              <select id="agenda-cliente" class="w-full p-3.5 bg-neutral-50 border border-neutral-300 rounded-xl text-base font-medium focus:outline-none focus:border-gold-400" required></select>
+            </div>
+            <div>
+              <label class="block text-sm font-bold uppercase text-neutral-700 mb-1">Procedimentos</label>
+              <p class="text-xs text-neutral-500 mb-2">Segure <kbd class="bg-neutral-200 px-1 rounded">Ctrl</kbd> ou <kbd class="bg-neutral-200 px-1 rounded">Cmd</kbd> para selecionar vários</p>
+              <select id="agenda-servico" multiple size="4" class="w-full p-2 bg-neutral-50 border border-neutral-300 rounded-xl text-base font-medium focus:outline-none focus:border-gold-400" required></select>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-bold uppercase text-neutral-700 mb-2">Data</label>
+                <input type="date" id="agenda-data" class="w-full p-3.5 bg-neutral-50 border border-neutral-300 rounded-xl text-base font-medium focus:outline-none focus:border-gold-400" required>
+              </div>
+              <div>
+                <label class="block text-sm font-bold uppercase text-neutral-700 mb-2">Horário</label>
+                <input type="time" id="agenda-hora" class="w-full p-3.5 bg-neutral-50 border border-neutral-300 rounded-xl text-base font-medium focus:outline-none focus:border-gold-400" required>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-bold uppercase text-neutral-700 mb-2">Forma de Pagamento</label>
+              <select id="agenda-pagamento" class="w-full p-3.5 bg-neutral-50 border border-neutral-300 rounded-xl text-base font-medium focus:outline-none focus:border-gold-400" required>
+                <option value="vista">À vista / Pix</option>
+                <option value="debito">Cartão de Débito</option>
+                <option value="credito">Cartão de Crédito</option>
+              </select>
+            </div>
+            <button type="submit" class="w-full bg-sidebar hover:bg-neutral-800 text-white font-bold py-4 rounded-xl text-sm uppercase tracking-wider transition shadow-md">Confirmar Agendamento</button>
+          </form>
+        </div>
+
+        <div class="lg:col-span-2 bg-white/95 backdrop-blur-sm p-5 sm:p-8 rounded-2xl border border-amber-200/60 shadow-md overflow-hidden">
+          <h3 class="font-serif text-2xl font-bold mb-6 text-neutral-900">Agendamentos Pendentes</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm sm:text-base min-w-[600px]">
+              <thead class="border-b-2 border-neutral-200 text-xs text-neutral-500 font-bold uppercase">
+                <tr>
+                  <th class="py-4 px-3">Data / Hora</th>
+                  <th class="py-4 px-3">Paciente</th>
+                  <th class="py-4 px-3">Procedimentos</th>
+                  <th class="py-4 px-3">Status</th>
+                  <th class="py-4 px-3 text-right">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="tabela-agendamentos" class="divide-y divide-neutral-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="secao-concluidos" class="hidden space-y-8">
+      <div>
+        <span class="text-xs font-extrabold tracking-widest uppercase bg-black/10 text-neutral-900 px-3 py-1 rounded-full">Histórico</span>
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-serif font-bold titulo-secao mt-2">Procedimentos Concluídos</h2>
+      </div>
+
+      <div class="bg-white/95 backdrop-blur-sm p-5 sm:p-8 rounded-2xl border border-amber-200/60 shadow-md overflow-hidden">
+        <h3 class="font-serif text-2xl font-bold mb-6 text-neutral-900">Atendimentos Finalizados</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm sm:text-base min-w-[600px]">
+            <thead class="border-b-2 border-neutral-200 text-xs text-neutral-500 font-bold uppercase">
+              <tr>
+                <th class="py-4 px-3">Data / Hora</th>
+                <th class="py-4 px-3">Paciente</th>
+                <th class="py-4 px-3">Procedimentos</th>
+                <th class="py-4 px-3">Status</th>
+                <th class="py-4 px-3 text-right">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-concluidos" class="divide-y divide-neutral-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="secao-pacientes" class="hidden space-y-8">
+      <div>
+        <span class="text-xs font-extrabold tracking-widest uppercase bg-black/10 text-neutral-900 px-3 py-1 rounded-full">Pacientes</span>
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-serif font-bold titulo-secao mt-2">Cadastro & Prontuários</h2>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="bg-white/95 backdrop-blur-sm p-5 sm:p-8 rounded-2xl border border-amber-200/60 shadow-md">
+          <h3 class="font-serif text-2xl font-bold mb-6 text-neutral-900" id="titulo-form-cliente">Cadastrar Paciente</h3>
+          <form id="form-cliente" class="space-y-5">
+            <input type="hidden" id="cliente-id">
+            <div>
+              <label class="block text-sm font-bold uppercase text-neutral-700 mb-2">Nome Completo</label>
+              <input type="text" id="cliente-nome" placeholder="Ex: Ana Souza" class="w-full p-3.5 bg-neutral-50 border border-neutral-300 rounded-xl text-base font-medium" required>
+            </div>
+            <div>
+              <label class="block text-sm font-bold uppercase text-neutral-700 mb-2">WhatsApp</label>
+              <input type="tel" id="cliente-telefone" placeholder="(11) 99999-9999" class="w-full p-3.5 bg-neutral-50 border border-neutral-300 rounded-xl text-base font-medium" required>
+            </div>
+            
+            <div id="box-prontuario-existente" class="hidden">
+              <label class="block text-sm font-bold uppercase text-neutral-700 mb-2">Histórico Registrado (Protegido)</label>
+              <div id="cliente-prontuario-bloqueado" class="w-full p-3.5 bg-neutral-100 border border-neutral-300 rounded-xl text-xs font-medium text-neutral-700 max-h-36 overflow-y-auto whitespace-pre-wrap select-none"></div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold uppercase text-neutral-700 mb-2" id="label-prontuario">Anamnese / Histórico Inicial</label>
+              <textarea id="cliente-prontuario" placeholder="Histórico e observações clínicas do paciente..." class="w-full p-3.5 bg-neutral-50 border border-neutral-300 rounded-xl text-base font-medium h-28"></textarea>
+            </div>
+
+            <button type="submit" id="btn-salvar-cliente" class="w-full bg-sidebar text-white font-bold py-4 rounded-xl text-sm uppercase tracking-wider transition">Salvar Paciente</button>
+            <button type="button" id="btn-cancelar-cliente" onclick="cancelarEdicaoPaciente()" class="hidden w-full bg-neutral-200 text-neutral-800 font-bold py-3 rounded-xl text-sm uppercase tracking-wider transition mt-2">Cancelar Edição</button>
+          </form>
+        </div>
+
+        <div class="lg:col-span-2 bg-white/95 backdrop-blur-sm p-5 sm:p-8 rounded-2xl border border-amber-200/60 shadow-md">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+              <h3 class="font-serif text-2xl font-bold text-neutral-900">Lista de Pacientes</h3>
+              <p class="text-xs text-neutral-500 mt-0.5">Clique em um paciente para opções de gerenciamento</p>
+            </div>
+            <div class="w-full sm:w-64">
+              <input type="text" id="busca-paciente" oninput="atualizarTelas()" placeholder="🔍 Buscar paciente..." class="w-full px-4 py-2 bg-neutral-50 border border-neutral-300 rounded-xl text-sm focus:outline-none focus:border-gold-400">
+            </div>
+          </div>
+          <div id="lista-pacientes" class="divide-y divide-neutral-100"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="secao-procedimentos" class="hidden space-y-8">
+      <div>
+        <span class="text-xs font-extrabold tracking-widest uppercase bg-black/10 text-neutral-900 px-3 py-1 rounded-full">Procedimentos</span>
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-serif font-bold titulo-secao mt-2">Tabela de Preços & Serviços</h2>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="bg-white/95 backdrop-blur-sm p-5 sm:p-8 rounded-2xl border border-amber-200/60 shadow-md">
+          <h3 class="font-serif text-2xl font-bold mb-6 text-neutral-900" id="titulo-form-servico">Novo Procedimento</h3>
+          <form id="form-servico" class="space-y-5">
+            <input type="hidden" id="servico-id">
+            <div>
+              <label class="block text-sm font-bold uppercase text-neutral-700 mb-2">Nome do Serviço</label>
+              <input type="text" id="servico-nome" placeholder="Ex: Drenagem Linfática" class="w-full p-3.5 bg-neutral-50 border border-neutral-300 rounded-xl text-base font-medium" required>
+            </div>
+            <div>
+              <label class="block text-sm font-bold uppercase text-neutral-700 mb-2">Duração do Procedimento</label>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-neutral-500 mb-1">Horas</label>
+                  <input type="number" id="servico-horas" min="0" placeholder="1" class="w-full p-3.5 bg-neutral-50 border border-neutral-300 rounded-xl text-base font-medium">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-neutral-500 mb-1">Minutos</label>
+                  <input type="number" id="servico-minutos" min="0" max="59" placeholder="30" class="w-full p-3.5 bg-neutral-50 border border-neutral-300 rounded-xl text-base font-medium">
+                </div>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-bold uppercase text-neutral-700 mb-2">Preço (R$)</label>
+              <input type="number" step="0.01" id="servico-preco" placeholder="180.00" class="w-full p-3.5 bg-neutral-50 border border-neutral-300 rounded-xl text-base font-medium" required>
+            </div>
+            <button type="submit" id="btn-servico" class="w-full bg-sidebar text-white font-bold py-4 rounded-xl text-sm uppercase tracking-wider transition">Salvar Procedimento</button>
+          </form>
+        </div>
+
+        <div class="lg:col-span-2 bg-white/95 backdrop-blur-sm p-5 sm:p-8 rounded-2xl border border-amber-200/60 shadow-md">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <h3 class="font-serif text-2xl font-bold text-neutral-900">Procedimentos Cadastrados</h3>
+            <div class="w-full sm:w-64">
+              <input type="text" id="busca-procedimento" oninput="atualizarTelas()" placeholder="🔍 Buscar procedimento..." class="w-full px-4 py-2 bg-neutral-50 border border-neutral-300 rounded-xl text-sm focus:outline-none focus:border-gold-400">
+            </div>
+          </div>
+          <div id="lista-procedimentos" class="divide-y divide-neutral-100"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="secao-produtos" class="hidden space-y-8">
+      <div>
+        <span class="text-xs font-extrabold tracking-widest uppercase bg-black/10 text-neutral-900 px-3 py-1 rounded-full">Gestão de Estoque</span>
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-serif font-bold titulo-secao mt-2">Cadastrar Produtos</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+        <div class="bg-white/95 backdrop-blur-sm p-5 rounded-2xl border border-amber-200/60 shadow-md text-center">
+          <p class="text-sm font-extrabold text-amber-700 uppercase tracking-wider">Total Investido</p>
+          <p class="text-3xl font-bold font-serif text-neutral-900 mt-1" id="prod-total-investido">R$ 0,00</p>
+        </div>
+        <div class="bg-white/95 backdrop-blur-sm p-5 rounded-2xl border border-amber-200/60 shadow-md text-center">
+          <p class="text-sm font-extrabold text-amber-700 uppercase tracking-wider">Total Venda</p>
+          <p class="text-3xl font-bold font-serif text-neutral-900 mt-1" id="prod-total-venda">R$ 0,00</p>
+        </div>
+        <div class="bg-white/95 backdrop-blur-sm p-5 rounded-2xl border border-amber-200/60 shadow-md text-center">
+          <p class="text-sm font-extrabold text-amber-700 uppercase tracking-wider">Lucro Total</p>
+          <p class="text-3xl font-bold font-serif text-neutral-900 mt-1" id="prod-lucro-total">R$ 0,00</p>
+        </div>
+      </div>
+
+      <div class="bg-white/95 backdrop-blur-sm p-5 sm:p-8 rounded-2xl border border-amber-200/60 shadow-md">
+        <form id="form-produto" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+            <div>
+              <label class="block text-xs font-bold uppercase text-neutral-700 mb-1">Data</label>
+              <input type="date" id="prod-data" class="w-full p-3 bg-neutral-50 border border-neutral-300 rounded-xl text-sm" required>
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-neutral-700 mb-1">Nº da Nota</label>
+              <input type="text" id="prod-nota" placeholder="Nº da Nota" class="w-full p-3 bg-neutral-50 border border-neutral-300 rounded-xl text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-neutral-700 mb-1">Produto</label>
+              <input type="text" id="prod-nome" placeholder="Nome do Produto" class="w-full p-3 bg-neutral-50 border border-neutral-300 rounded-xl text-sm" required>
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-neutral-700 mb-1">Valor Compra (R$)</label>
+              <input type="number" step="0.01" id="prod-compra" placeholder="0.00" class="w-full p-3 bg-neutral-50 border border-neutral-300 rounded-xl text-sm" required>
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-neutral-700 mb-1">Valor Frete (R$)</label>
+              <input type="number" step="0.01" id="prod-frete" placeholder="0.00" class="w-full p-3 bg-neutral-50 border border-neutral-300 rounded-xl text-sm">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+            <div>
+              <label class="block text-xs font-bold uppercase text-neutral-700 mb-1">Valor Insumos (R$)</label>
+              <input type="number" step="0.01" id="prod-insumos" placeholder="0.00" class="w-full p-3 bg-neutral-50 border border-neutral-300 rounded-xl text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-neutral-700 mb-1">Margem Lucro %</label>
+              <input type="number" step="0.01" id="prod-margem" placeholder="Ex: 50" class="w-full p-3 bg-neutral-50 border border-neutral-300 rounded-xl text-sm" required>
+            </div>
+            <div>
+              <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3.5 rounded-xl text-sm uppercase tracking-wider transition shadow-md">Cadastrar Produto</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="bg-white/95 backdrop-blur-sm p-5 sm:p-8 rounded-2xl border border-amber-200/60 shadow-md overflow-hidden">
+        <h3 class="font-serif text-2xl font-bold mb-6 text-neutral-900">Produtos Cadastrados</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm min-w-[750px]">
+            <thead class="bg-amber-600 text-white font-bold text-xs uppercase">
+              <tr>
+                <th class="py-3 px-3">Data</th>
+                <th class="py-3 px-3">Nota</th>
+                <th class="py-3 px-3">Produto</th>
+                <th class="py-3 px-3">Compra</th>
+                <th class="py-3 px-3">Frete</th>
+                <th class="py-3 px-3">Insumos</th>
+                <th class="py-3 px-3">Custo Total</th>
+                <th class="py-3 px-3">Venda</th>
+                <th class="py-3 px-3">Lucro</th>
+                <th class="py-3 px-3 text-center">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-produtos" class="divide-y divide-neutral-200 font-medium"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="secao-fotos" class="hidden space-y-8">
+      <div>
+        <span class="text-xs font-extrabold tracking-widest uppercase bg-black/10 text-neutral-900 px-3 py-1 rounded-full">Registro Visual</span>
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-serif font-bold titulo-secao mt-2">Galeria de Fotos & Produtos nos Clientes</h2>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="bg-white/95 backdrop-blur-sm p-5 sm:p-8 rounded-2xl border border-amber-200/60 shadow-md">
+          <h3 class="font-serif text-2xl font-bold mb-6 text-neutral-900">Nova Foto / Registro</h3>
+          <form id="form-foto" class="space-y-4">
+            <div>
+              <label class="block text-sm font-bold uppercase text-neutral-700 mb-2">Paciente</label>
+              <select id="foto-cliente" class="w-full p-3 bg-neutral-50 border border-neutral-300 rounded-xl text-sm focus:outline-none" required></select>
+            </div>
+            <div>
+              <label class="block text-sm font-bold uppercase text-neutral-700 mb-2">Produto / Procedimento Utilizado</label>
+              <input type="text" id="foto-produto-nome" placeholder="Ex: Sérum Hialurônico / Toxina Botulínica" class="w-full p-3 bg-neutral-50 border border-neutral-300 rounded-xl text-sm" required>
+            </div>
+            <div>
+              <label class="block text-sm font-bold uppercase text-neutral-700 mb-2">Data da Aplicação</label>
+              <input type="date" id="foto-data" class="w-full p-3 bg-neutral-50 border border-neutral-300 rounded-xl text-sm" required>
+            </div>
+            <div>
+              <label class="block text-sm font-bold uppercase text-neutral-700 mb-2">Selecionar Foto</label>
+              <input type="file" id="foto-arquivo" accept="image/*" class="w-full p-2 bg-neutral-50 border border-neutral-300 rounded-xl text-xs cursor-pointer" required>
+            </div>
+            <div>
+              <label class="block text-sm font-bold uppercase text-neutral-700 mb-2">Observações / Resultados</label>
+              <textarea id="foto-obs" placeholder="Detalhes do resultado, sessão 1 de 3, reação na pele..." class="w-full p-3 bg-neutral-50 border border-neutral-300 rounded-xl text-sm h-20"></textarea>
+            </div>
+            <button type="submit" class="w-full bg-sidebar hover:bg-neutral-800 text-white font-bold py-3.5 rounded-xl text-sm uppercase tracking-wider transition shadow-md">Salvar Foto</button>
+          </form>
+        </div>
+
+        <div class="lg:col-span-2 bg-white/95 backdrop-blur-sm p-5 sm:p-8 rounded-2xl border border-amber-200/60 shadow-md">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <h3 class="font-serif text-2xl font-bold text-neutral-900">Fotos Registradas</h3>
+            <div class="w-full sm:w-64">
+              <input type="text" id="busca-foto" oninput="atualizarTelas()" placeholder="🔍 Buscar por paciente ou produto..." class="w-full px-4 py-2 bg-neutral-50 border border-neutral-300 rounded-xl text-sm focus:outline-none focus:border-gold-400">
+            </div>
+          </div>
+
+          <div id="grid-fotos" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="secao-orcamentos" class="hidden space-y-8">
+      <div>
+        <span class="text-xs font-extrabold tracking-widest uppercase bg-black/10 text-neutral-900 px-3 py-1 rounded-full">Propostas</span>
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-serif font-bold titulo-secao mt-2">Gerador de Orçamentos</h2>
+        <p class="text-sm sm:text-base text-neutral-900 mt-2 font-semibold">Crie, salve e gere PDFs das suas propostas de atendimento.</p>
+      </div>
+
+      <div class="bg-white/95 backdrop-blur-sm p-2 sm:p-4 rounded-2xl border border-amber-200/60 shadow-md overflow-hidden">
+        <iframe class="orcamentos-frame" src="./orcamento-atualizado.html" title="Gerador de Orçamentos"></iframe>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="modal-foto-zoom" class="hidden fixed inset-0 bg-black/80 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl relative border border-amber-200/60 flex flex-col max-h-[90vh]">
+      <div class="p-4 border-b flex justify-between items-center bg-neutral-900 text-white">
+        <div>
+          <h4 id="zoom-paciente" class="font-serif font-bold text-xl text-gold-400"></h4>
+          <p id="zoom-produto" class="text-xs text-neutral-300 font-semibold"></p>
+        </div>
+        <button onclick="fecharModalFoto()" class="text-neutral-400 hover:text-white text-2xl font-bold">✕</button>
+      </div>
+      <div class="flex-1 overflow-auto p-4 bg-neutral-900 flex items-center justify-center">
+        <img id="zoom-img" src="" alt="Foto expandida" class="max-h-[60vh] object-contain rounded-lg">
+      </div>
+      <div class="p-4 bg-white border-t space-y-1">
+        <p class="text-xs text-neutral-500 font-bold uppercase" id="zoom-data"></p>
+        <p class="text-sm text-neutral-800" id="zoom-obs"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-paciente" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-amber-200/60">
+      <div class="flex justify-between items-start mb-4 border-b pb-3">
+        <div>
+          <h3 class="font-serif text-2xl font-bold text-neutral-900" id="modal-paciente-nome">Paciente</h3>
+          <p class="text-xs text-gold-500 font-bold uppercase tracking-wider mt-0.5">Gerenciamento do Paciente</p>
+        </div>
+        <button onclick="fecharModalPaciente()" class="text-neutral-400 hover:text-neutral-800 text-xl font-bold">✕</button>
+      </div>
+      <p class="text-sm text-neutral-600 mb-6">Escolha uma ação para este paciente:</p>
+      <div class="space-y-3">
+        <button onclick="executarAcaoModal('pdf')" class="w-full flex items-center justify-between p-4 bg-neutral-50 border border-neutral-200 hover:border-gold-400 rounded-xl text-left transition font-semibold text-neutral-800 hover:bg-bege-100">
+          <span class="flex items-center gap-3">📄 Criar PDF do Histórico</span>
+          <span class="text-gold-500 font-bold">→</span>
+        </button>
+        <button onclick="executarAcaoModal('aba')" class="w-full flex items-center justify-between p-4 bg-neutral-50 border border-neutral-200 hover:border-gold-400 rounded-xl text-left transition font-semibold text-neutral-800 hover:bg-bege-100">
+          <span class="flex items-center gap-3">🌐 Abrir Histórico em Nova Aba</span>
+          <span class="text-gold-500 font-bold">→</span>
+        </button>
+        <button onclick="executarAcaoModal('editar')" class="w-full flex items-center justify-between p-4 bg-amber-50/60 border border-amber-200 hover:border-gold-400 rounded-xl text-left transition font-semibold text-amber-900 hover:bg-amber-100/80">
+          <span class="flex items-center gap-3">✏️ Acrescentar à Anamnese</span>
+          <span class="text-gold-500 font-bold">→</span>
+        </button>
+        <button onclick="executarAcaoModal('excluir')" class="w-full flex items-center justify-between p-4 bg-red-50 border border-red-200 hover:border-red-400 rounded-xl text-left transition font-semibold text-red-700 hover:bg-red-100">
+          <span class="flex items-center gap-3">🗑️ Excluir Paciente</span>
+          <span class="text-red-500 font-bold">→</span>
+        </button>
+      </div>
+      <button onclick="fecharModalPaciente()" class="w-full mt-6 py-3 text-xs font-bold text-neutral-500 uppercase tracking-wider hover:text-neutral-800">Cancelar</button>
+    </div>
+  </div>
+
+  <div class="hidden">
+    <div id="comprovante-template" class="p-8 bg-white border border-neutral-200 text-neutral-900 font-sans">
+      <div class="text-center border-b pb-4 mb-6">
+        <h1 class="text-3xl font-serif font-bold text-neutral-900">✦ Claucia Estética</h1>
+        <p class="text-xs uppercase tracking-widest text-gold-500 mt-1">Comprovante de Agendamento</p>
+      </div>
+      <div class="space-y-4 text-base mb-8">
+        <p><strong>Paciente:</strong> <span id="pdf-cliente"></span></p>
+        <p><strong>Telefone:</strong> <span id="pdf-telefone"></span></p>
+        <p><strong>Procedimentos:</strong> <span id="pdf-servico"></span></p>
+        <p><strong>Data & Hora:</strong> <span id="pdf-data"></span></p>
+        <p><strong>Forma de Pagamento:</strong> <span id="pdf-pagamento"></span></p>
+        <p><strong>Status:</strong> <span id="pdf-status"></span></p>
+        <div class="pt-3 border-t">
+          <p class="text-xl font-serif font-bold text-neutral-900 mt-1"><strong>Valor Final:</strong> R$ <span id="pdf-valor"></span></p>
+        </div>
+      </div>
+      <div class="text-center text-xs text-neutral-400 border-t pt-4">Agradecemos a preferência!</div>
+    </div>
+
+    <div id="historico-pdf-template" class="p-8 bg-white text-neutral-900 font-sans">
+      <div class="text-center border-b pb-4 mb-6">
+        <h1 class="text-3xl font-serif font-bold text-neutral-900">✦ Claucia Estética</h1>
+        <p class="text-xs uppercase tracking-widest text-gold-500 mt-1">Prontuário & Histórico do Paciente</p>
+      </div>
+      <div class="mb-6 bg-neutral-50 p-4 rounded-xl border border-neutral-200 space-y-1">
+        <p class="text-lg font-bold text-neutral-900" id="hist-pdf-nome"></p>
+        <p class="text-xs text-neutral-600">WhatsApp: <span id="hist-pdf-tel"></span></p>
+        <p class="text-xs text-neutral-600 whitespace-pre-wrap">Anamnese: <span id="hist-pdf-prontuario"></span></p>
+      </div>
+      <h3 class="font-serif font-bold text-xl mb-3 border-b pb-1">Histórico de Atendimentos</h3>
+      <div id="hist-pdf-lista" class="space-y-3 mb-6"></div>
+      <div class="text-center text-xs text-neutral-400 border-t pt-4">Documento gerado em <span id="hist-pdf-gerado-em"></span></div>
+    </div>
+  </div>
+
+  <script>
+    let db = {
+      servicos: JSON.parse(localStorage.getItem('clau_servicos')) || [],
+      clientes: JSON.parse(localStorage.getItem('clau_clientes')) || [],
+      agendamentos: JSON.parse(localStorage.getItem('clau_agendamentos')) || [],
+      produtos: JSON.parse(localStorage.getItem('clau_produtos')) || [],
+      fotos: JSON.parse(localStorage.getItem('clau_fotos')) || []
+    };
+
+    let pacienteSelecionadoId = null;
+    let receitaOculta = false;
+
+    function formatarDuracao(minutosTotais) {
+      const min = parseInt(minutosTotais) || 0;
+      const h = Math.floor(min / 60);
+      const m = min % 60;
+
+      if (h > 0 && m > 0) return `${h}h ${m}min`;
+      if (h > 0) return `${h}h`;
+      return `${m}min`;
+    }
+
+    function horaParaMinutos(horaStr) {
+      if (!horaStr) return 0;
+      const [h, m] = horaStr.split(':').map(Number);
+      return (h * 60) + m;
+    }
+
+    function minutosParaHora(minutosTotais) {
+      const h = Math.floor(minutosTotais / 60) % 24;
+      const m = minutosTotais % 60;
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    }
+
+    function calcularDuracaoTotalAgendamento(agendamento) {
+      const servicos = obterServicosDoAgendamento(agendamento);
+      const duracao = servicos.reduce((acc, s) => acc + (parseInt(s.duracao) || 30), 0);
+      return duracao > 0 ? duracao : 30; 
+    }
+
+    function toggleMenu() {
+      document.getElementById('sidebar').classList.toggle('hidden');
+    }
+
+    function toggleOcultarReceita() {
+      receitaOculta = !receitaOculta;
+      document.getElementById('icone-olho').innerText = receitaOculta ? '🙈' : '👁️';
+      atualizarTelas();
+    }
+
+    function salvar() {
+      localStorage.setItem('clau_servicos', JSON.stringify(db.servicos));
+      localStorage.setItem('clau_clientes', JSON.stringify(db.clientes));
+      localStorage.setItem('clau_agendamentos', JSON.stringify(db.agendamentos));
+      localStorage.setItem('clau_produtos', JSON.stringify(db.produtos));
+      localStorage.setItem('clau_fotos', JSON.stringify(db.fotos));
+      atualizarTelas();
+    }
+
+    function mudarAba(aba) {
+      ['painel', 'agenda', 'concluidos', 'pacientes', 'procedimentos', 'produtos', 'fotos', 'orcamentos'].forEach(a => {
+        document.getElementById(`secao-${a}`).classList.add('hidden');
+        document.getElementById(`tab-${a}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition text-neutral-400 hover:text-white hover:bg-neutral-800/50";
+      });
+      document.getElementById(`secao-${aba}`).classList.remove('hidden');
+      document.getElementById(`tab-${aba}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition bg-neutral-800 text-white";
+      
+      if (window.innerWidth < 768) {
+        document.getElementById('sidebar').classList.add('hidden');
+      }
+    }
+
+    function obterServicosDoAgendamento(a) {
+      if (Array.isArray(a.servicosIds)) {
+        return a.servicosIds.map(id => db.servicos.find(s => s.id == id)).filter(Boolean);
+      } else if (a.servicoId) {
+        const s = db.servicos.find(item => item.id == a.servicoId);
+        return s ? [s] : [];
+      }
+      return [];
+    }
+
+    function obterDataHojeLocal() {
+      const hoje = new Date();
+      const ano = hoje.getFullYear();
+      const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+      const dia = String(hoje.getDate()).padStart(2, '0');
+      return `${ano}-${mes}-${dia}`;
+    }
+
+    function abrirModalPaciente(id) {
+      pacienteSelecionadoId = id;
+      const c = db.clientes.find(item => item.id == id);
+      if (!c) return;
+      document.getElementById('modal-paciente-nome').innerText = c.nome;
+      document.getElementById('modal-paciente').classList.remove('hidden');
+    }
+
+    function fecharModalPaciente() {
+      document.getElementById('modal-paciente').classList.add('hidden');
+      pacienteSelecionadoId = null;
+    }
+
+    function executarAcaoModal(tipo) {
+      if (!pacienteSelecionadoId) return;
+      
+      const idAtual = pacienteSelecionadoId;
+      fecharModalPaciente();
+
+      if (tipo === 'pdf') {
+        gerarPDFHistorico(idAtual);
+      } else if (tipo === 'aba') {
+        abrirHistoricoEmNovaAba(idAtual);
+      } else if (tipo === 'editar') {
+        editarPaciente(idAtual);
+      } else if (tipo === 'excluir') {
+        excluirPaciente(idAtual);
+      }
+    }
+
+    function editarPaciente(id) {
+      const c = db.clientes.find(item => item.id == id);
+      if (!c) return;
+
+      mudarAba('pacientes');
+
+      document.getElementById('cliente-id').value = c.id;
+      document.getElementById('cliente-nome').value = c.nome;
+      document.getElementById('cliente-telefone').value = c.telefone;
+
+      const boxBloqueado = document.getElementById('box-prontuario-existente');
+      const prontuarioBloqueado = document.getElementById('cliente-prontuario-bloqueado');
+      
+      boxBloqueado.classList.remove('hidden');
+      prontuarioBloqueado.innerHTML = c.prontuario && c.prontuario.trim() !== '' ? c.prontuario : 'Nenhum histórico registrado anteriormente.';
+
+      document.getElementById('cliente-prontuario').value = '';
+      document.getElementById('label-prontuario').innerText = 'Nova Observação para a Anamnese';
+      document.getElementById('cliente-prontuario').placeholder = 'Digite aqui as novas informações a acrescentar...';
+
+      document.getElementById('titulo-form-cliente').innerText = 'Acrescentar Observação ao Paciente';
+      document.getElementById('btn-salvar-cliente').innerText = 'Salvar Acréscimo';
+      document.getElementById('btn-cancelar-cliente').classList.remove('hidden');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelarEdicaoPaciente() {
+      document.getElementById('cliente-id').value = '';
+      document.getElementById('form-cliente').reset();
+      document.getElementById('box-prontuario-existente').classList.add('hidden');
+      document.getElementById('label-prontuario').innerText = 'Anamnese / Histórico Inicial';
+      document.getElementById('cliente-prontuario').placeholder = 'Histórico e observações clínicas do paciente...';
+      document.getElementById('titulo-form-cliente').innerText = 'Cadastrar Paciente';
+      document.getElementById('btn-salvar-cliente').innerText = 'Salvar Paciente';
+      document.getElementById('btn-cancelar-cliente').classList.add('hidden');
+    }
+
+    function excluirPaciente(id) {
+      const c = db.clientes.find(item => item.id == id);
+      if (!c) return;
+
+      if (confirm(`Tem certeza que deseja excluir o(a) paciente ${c.nome}? Essa ação não poderá ser desfeita.`)) {
+        db.clientes = db.clientes.filter(item => item.id != id);
+        salvar();
+        alert('Paciente removido(a) com sucesso.');
+      }
+    }
+
+    function gerarPDFHistorico(clienteId) {
+      const c = db.clientes.find(item => item.id == clienteId);
+      if (!c) return;
+
+      const agendamentosPaciente = db.agendamentos.filter(a => a.clienteId == clienteId);
+
+      document.getElementById('hist-pdf-nome').innerText = c.nome;
+      document.getElementById('hist-pdf-tel').innerText = c.telefone;
+      document.getElementById('hist-pdf-prontuario').innerHTML = c.prontuario || 'Sem observações';
+      document.getElementById('hist-pdf-gerado-em').innerText = new Date().toLocaleDateString('pt-BR');
+
+      const containerLista = document.getElementById('hist-pdf-lista');
+      if (agendamentosPaciente.length === 0) {
+        containerLista.innerHTML = '<p class="text-xs text-neutral-500 italic">Nenhum atendimento registrado até o momento.</p>';
+      } else {
+        containerLista.innerHTML = agendamentosPaciente.map(a => {
+          const servicos = obterServicosDoAgendamento(a);
+          const nomes = servicos.map(s => s.nome).join(', ');
+          const dataFmt = a.data.split('-').reverse().join('/');
+          const statusTxt = (a.status || 'pendente').toUpperCase();
+          return `
+            <div class="p-3 border rounded-lg text-xs flex justify-between items-center">
+              <div>
+                <p class="font-bold text-neutral-800">${dataFmt} às ${a.hora} - ${nomes}</p>
+                <p class="text-neutral-500">Pagamento: ${a.pagamento || 'N/A'}</p>
+              </div>
+              <span class="px-2 py-1 rounded text-[10px] font-bold ${a.status === 'cancelado' ? 'bg-red-100 text-red-700' : (a.status === 'concluido' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700')}">${statusTxt}</span>
+            </div>`;
+        }).join('');
+      }
+
+      const element = document.getElementById('historico-pdf-template');
+      html2pdf().set({
+        margin: 10,
+        filename: `Historico_${c.nome.replace(/\s+/g, '_')}.pdf`,
+        jsPDF: { format: 'a5' }
+      }).from(element).save();
+    }
+
+    function abrirHistoricoEmNovaAba(clienteId) {
+      const c = db.clientes.find(item => item.id == clienteId);
+      if (!c) return;
+
+      const agendamentosPaciente = db.agendamentos.filter(a => a.clienteId == clienteId);
+
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8">
+          <title>Histórico - ${c.nome}</title>
+          <script src="https://cdn.tailwindcss.com"><\/script>
+          <style>
+            .nota-adicional {
+              color: #92400e;
+              font-weight: 600;
+              background-color: #fef3c7;
+              padding: 2px 6px;
+              border-radius: 4px;
+              border-left: 3px solid #d97706;
+              display: block;
+              margin-top: 4px;
+            }
+          </style>
+        </head>
+        <body class="bg-neutral-100 p-8 font-sans">
+          <div class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-md border border-neutral-200">
+            <h1 class="text-3xl font-bold text-neutral-900 border-b pb-4 mb-4">✦ Claucia Estética</h1>
+            <h2 class="text-2xl font-semibold mb-2">${c.nome}</h2>
+            <p class="text-sm text-neutral-600 mb-1"><strong>Telefone:</strong> ${c.telefone}</p>
+            <div class="text-sm text-neutral-600 mb-6 whitespace-pre-wrap"><strong>Anamnese:</strong>\n${c.prontuario || 'Sem histórico'}</div>
+            
+            <h3 class="text-lg font-bold text-neutral-800 border-b pb-2 mb-4">Histórico de Agendamentos</h3>
+            ${agendamentosPaciente.length === 0 ? '<p class="text-sm text-neutral-500">Nenhum agendamento cadastrado.</p>' : `
+              <div class="space-y-3">
+                ${agendamentosPaciente.map(a => {
+                  const servs = obterServicosDoAgendamento(a);
+                  const nomes = servs.map(s => s.nome).join(', ');
+                  const dataFmt = a.data.split('-').reverse().join('/');
+                  const st = a.status || 'pendente';
+                  const badgeColor = st === 'cancelado' ? 'bg-red-100 text-red-700' : (st === 'concluido' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700');
+                  return `
+                    <div class="p-4 bg-neutral-50 border rounded-xl flex justify-between items-center">
+                      <div>
+                        <p class="font-bold text-neutral-800">${dataFmt} às ${a.hora}</p>
+                        <p class="text-sm text-neutral-600">${nomes}</p>
+                      </div>
+                      <span class="px-3 py-1 rounded-full text-xs font-bold ${badgeColor}">${st.toUpperCase()}</span>
+                    </div>`;
+                }).join('')}
+              </div>
+            `}
+          </div>
+        </body>
+        </html>
+      `;
+
+      const novaAba = window.open();
+      novaAba.document.write(htmlContent);
+      novaAba.document.close();
+    }
+
+    function alterarStatus(agendamentoId, novoStatus) {
+      const a = db.agendamentos.find(item => item.id == agendamentoId);
+      if (a) {
+        if (novoStatus === 'cancelado') {
+          const confirmaExclusao = confirm('Você selecionou a opção de Cancelado. Deseja excluir este agendamento permanentemente?');
+          if (confirmaExclusao) {
+            db.agendamentos = db.agendamentos.filter(item => item.id != agendamentoId);
+            salvar();
+            return;
+          }
+        }
+        a.status = novoStatus;
+        salvar();
+      }
+    }
+
+    document.getElementById('form-servico').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = document.getElementById('servico-id').value;
+      const nome = document.getElementById('servico-nome').value;
+      const horas = parseInt(document.getElementById('servico-horas').value) || 0;
+      const minutos = parseInt(document.getElementById('servico-minutos').value) || 0;
+      const duracaoTotal = (horas * 60) + minutos;
+
+      if (duracaoTotal <= 0) {
+        alert('Por favor, defina uma duração válida (horas ou minutos).');
+        return;
+      }
+
+      const preco = parseFloat(document.getElementById('servico-preco').value).toFixed(2);
+
+      if (id) {
+        const item = db.servicos.find(s => s.id == id);
+        item.nome = nome; 
+        item.duracao = duracaoTotal; 
+        item.preco = preco;
+      } else {
+        db.servicos.push({ id: Date.now(), nome, duracao: duracaoTotal, preco });
+      }
+
+      document.getElementById('servico-id').value = '';
+      document.getElementById('titulo-form-servico').innerText = 'Novo Procedimento';
+      e.target.reset();
+      salvar();
+    });
+
+    function editarServico(id) {
+      const s = db.servicos.find(item => item.id == id);
+      if (!s) return;
+      document.getElementById('servico-id').value = s.id;
+      document.getElementById('servico-nome').value = s.nome;
+      
+      const duracaoTotal = parseInt(s.duracao) || 0;
+      document.getElementById('servico-horas').value = Math.floor(duracaoTotal / 60) || '';
+      document.getElementById('servico-minutos').value = (duracaoTotal % 60) || '';
+      
+      document.getElementById('servico-preco').value = s.preco;
+      document.getElementById('titulo-form-servico').innerText = 'Editar Procedimento';
+    }
+
+    function excluirServico(id) {
+      db.servicos = db.servicos.filter(s => s.id != id);
+      salvar();
+    }
+
+    // CADASTRO DE PRODUTOS
+    document.getElementById('form-produto').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = document.getElementById('prod-data').value;
+      const nota = document.getElementById('prod-nota').value;
+      const nome = document.getElementById('prod-nome').value;
+      const compra = parseFloat(document.getElementById('prod-compra').value) || 0;
+      const frete = parseFloat(document.getElementById('prod-frete').value) || 0;
+      const insumos = parseFloat(document.getElementById('prod-insumos').value) || 0;
+      const margem = parseFloat(document.getElementById('prod-margem').value) || 0;
+
+      const custoTotal = compra + frete + insumos;
+      const valorVenda = custoTotal * (1 + margem / 100);
+      const lucro = valorVenda - custoTotal;
+
+      db.produtos.push({
+        id: Date.now(),
+        data,
+        nota,
+        nome,
+        compra,
+        frete,
+        insumos,
+        custoTotal,
+        margem,
+        valorVenda,
+        lucro
+      });
+
+      e.target.reset();
+      document.getElementById('prod-data').value = obterDataHojeLocal();
+      salvar();
+    });
+
+    function excluirProduto(id) {
+      if (confirm('Deseja excluir este produto?')) {
+        db.produtos = db.produtos.filter(p => p.id != id);
+        salvar();
+      }
+    }
+
+    // CADASTRO DE FOTOS DOS PRODUTOS / PACIENTES
+    document.getElementById('form-foto').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const clienteId = document.getElementById('foto-cliente').value;
+      const produtoNome = document.getElementById('foto-produto-nome').value;
+      const data = document.getElementById('foto-data').value;
+      const obs = document.getElementById('foto-obs').value;
+      const fileInput = document.getElementById('foto-arquivo');
+
+      if (!fileInput.files || !fileInput.files[0]) {
+        alert('Selecione uma imagem para enviar.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const imagemBase64 = event.target.result;
+
+        db.fotos.push({
+          id: Date.now(),
+          clienteId,
+          produtoNome,
+          data,
+          obs,
+          imagem: imagemBase64
+        });
+
+        e.target.reset();
+        document.getElementById('foto-data').value = obterDataHojeLocal();
+        salvar();
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    });
+
+    function excluirFoto(id) {
+      if (confirm('Deseja excluir esta foto permanentemente?')) {
+        db.fotos = db.fotos.filter(f => f.id != id);
+        salvar();
+      }
+    }
+
+    function abrirModalFoto(id) {
+      const f = db.fotos.find(item => item.id == id);
+      if (!f) return;
+
+      const c = db.clientes.find(item => item.id == f.clienteId);
+      document.getElementById('zoom-paciente').innerText = c ? c.nome : 'Paciente';
+      document.getElementById('zoom-produto').innerText = `Produto/Procedimento: ${f.produtoNome}`;
+      document.getElementById('zoom-data').innerText = `Data: ${f.data.split('-').reverse().join('/')}`;
+      document.getElementById('zoom-obs').innerText = f.obs ? `Observações: ${f.obs}` : 'Sem observações adicionais.';
+      document.getElementById('zoom-img').src = f.imagem;
+
+      document.getElementById('modal-foto-zoom').classList.remove('hidden');
+    }
+
+    function fecharModalFoto() {
+      document.getElementById('modal-foto-zoom').classList.add('hidden');
+    }
+
+    document.getElementById('form-cliente').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = document.getElementById('cliente-id').value;
+      const nome = document.getElementById('cliente-nome').value;
+      const telefone = document.getElementById('cliente-telefone').value;
+      const novoTextoAcrescentado = document.getElementById('cliente-prontuario').value.trim();
+
+      if (id) {
+        const item = db.clientes.find(c => c.id == id);
+        if (item) {
+          item.nome = nome;
+          item.telefone = telefone;
+          
+          if (novoTextoAcrescentado) {
+            const dataHoje = new Date().toLocaleDateString('pt-BR');
+            const horaHoje = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            
+            const textoFormatado = `<span class="nota-adicional">(${dataHoje} às ${horaHoje}) - ${novoTextoAcrescentado}</span>`;
+            
+            if (item.prontuario && item.prontuario.trim() !== '') {
+              item.prontuario = `${item.prontuario}\n${textoFormatado}`;
+            } else {
+              item.prontuario = textoFormatado;
+            }
+          }
+        }
+      } else {
+        let prontuarioInicial = novoTextoAcrescentado;
+        if (prontuarioInicial) {
+          const dataHoje = new Date().toLocaleDateString('pt-BR');
+          const horaHoje = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+          prontuarioInicial = `<span class="nota-adicional">(${dataHoje} às ${horaHoje}) - ${prontuarioInicial}</span>`;
+        }
+        db.clientes.push({
+          id: Date.now(),
+          nome: nome,
+          telefone: telefone,
+          prontuario: prontuarioInicial
+        });
+      }
+
+      cancelarEdicaoPaciente();
+      salvar();
+    });
+
+    document.getElementById('form-agendamento').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const selectServicos = document.getElementById('agenda-servico');
+      const selecionados = Array.from(selectServicos.selectedOptions).map(opt => opt.value);
+      const data = document.getElementById('agenda-data').value;
+      const hora = document.getElementById('agenda-hora').value;
+
+      if (selecionados.length === 0) {
+        alert('Selecione pelo menos um procedimento.');
+        return;
+      }
+
+      const duracaoTotal = selecionados.reduce((acc, id) => {
+        const s = db.servicos.find(item => item.id == id);
+        return acc + (s ? (parseInt(s.duracao) || 30) : 30);
+      }, 0);
+
+      const novoInicio = horaParaMinutos(hora);
+      const novoFim = novoInicio + duracaoTotal;
+
+      const conflito = db.agendamentos.find(a => {
+        if (a.data !== data || a.status === 'cancelado') return false;
+
+        const aInicio = horaParaMinutos(a.hora);
+        const aDuracao = calcularDuracaoTotalAgendamento(a);
+        const aFim = aInicio + aDuracao;
+
+        return novoInicio < aFim && novoFim > aInicio;
+      });
+
+      if (conflito) {
+        const clienteConflito = db.clientes.find(c => c.id == conflito.clienteId);
+        const nomeCliente = clienteConflito ? clienteConflito.nome : 'outro paciente';
+        const cInicio = conflito.hora;
+        const cFim = minutosParaHora(horaParaMinutos(conflito.hora) + calcularDuracaoTotalAgendamento(conflito));
+
+        alert(`Horário indisponível!\n\nJá existe um agendamento para ${nomeCliente} das ${cInicio} às ${cFim}.\nPor favor, escolha outro horário.`);
+        return;
+      }
+
+      db.agendamentos.push({
+        id: Date.now(),
+        clienteId: document.getElementById('agenda-cliente').value,
+        servicosIds: selecionados,
+        data: data,
+        hora: hora,
+        pagamento: document.getElementById('agenda-pagamento').value,
+        status: 'pendente'
+      });
+      salvar();
+      e.target.reset();
+      document.getElementById('agenda-data').value = obterDataHojeLocal();
+    });
+
+    function gerarPDF(id) {
+      const a = db.agendamentos.find(item => item.id == id);
+      const c = db.clientes.find(item => item.id == a.clienteId);
+      const listaServicos = obterServicosDoAgendamento(a);
+
+      const nomesServicos = listaServicos.map(s => s.nome).join(', ');
+      const subtotal = listaServicos.reduce((acc, s) => acc + parseFloat(s.preco), 0);
+
+      let valorFinal = subtotal;
+      let nomePagamento = "Cartão de Crédito";
+
+      if (a.pagamento === 'vista') {
+        nomePagamento = "À vista / Pix";
+      } else if (a.pagamento === 'debito') {
+        nomePagamento = "Cartão de Débito";
+      }
+
+      document.getElementById('pdf-cliente').innerText = c ? c.nome : 'N/A';
+      document.getElementById('pdf-telefone').innerText = c ? c.telefone : 'N/A';
+      document.getElementById('pdf-servico').innerText = nomesServicos || 'N/A';
+      document.getElementById('pdf-data').innerText = `${a.data.split('-').reverse().join('/')} às ${a.hora}`;
+      document.getElementById('pdf-pagamento').innerText = nomePagamento;
+      document.getElementById('pdf-status').innerText = (a.status || 'pendente').toUpperCase();
+      document.getElementById('pdf-valor').innerText = valorFinal.toFixed(2);
+
+      const element = document.getElementById('comprovante-template');
+      html2pdf().set({
+        margin: 10,
+        filename: `Comprovante_${c ? c.nome : 'Atendimento'}.pdf`,
+        jsPDF: { format: 'a5' }
+      }).from(element).save();
+    }
+
+    function ehAgendamentoNoPeriodo(dataAgendamento, periodo) {
+      if (!dataAgendamento) return false;
+      const partes = dataAgendamento.split('-');
+      const dataAg = new Date(partes[0], partes[1] - 1, partes[2]);
+      const hoje = new Date();
+
+      if (periodo === 'hoje') {
+        return dataAg.toDateString() === hoje.toDateString();
+      } else if (periodo === 'semana') {
+        const primeiroDiaSemana = new Date(hoje);
+        primeiroDiaSemana.setDate(hoje.getDate() - hoje.getDay());
+        primeiroDiaSemana.setHours(0,0,0,0);
+
+        const ultimoDiaSemana = new Date(primeiroDiaSemana);
+        ultimoDiaSemana.setDate(primeiroDiaSemana.getDate() + 6);
+        ultimoDiaSemana.setHours(23,59,59,999);
+
+        return dataAg >= primeiroDiaSemana && dataAg <= ultimoDiaSemana;
+      } else if (periodo === 'mes') {
+        return dataAg.getMonth() === hoje.getMonth() && dataAg.getFullYear() === hoje.getFullYear();
+      } else if (periodo === 'ano') {
+        return dataAg.getFullYear() === hoje.getFullYear();
+      }
+      return true;
+    }
+
+    function renderizarLinhaAgendamento(a) {
+      const c = db.clientes.find(item => item.id == a.clienteId);
+      const servicos = obterServicosDoAgendamento(a);
+      const nomes = servicos.map(s => s.nome).join(', ');
+      const st = a.status || 'pendente';
+      return `
+        <tr class="hover:bg-bege-100 transition">
+          <td class="py-4 px-3 text-xs sm:text-sm font-semibold">${a.data.split('-').reverse().join('/')} às ${a.hora}</td>
+          <td class="py-4 px-3 text-sm sm:text-base font-bold text-neutral-900">${c ? c.nome : 'N/A'}</td>
+          <td class="py-4 px-3 text-xs sm:text-sm text-neutral-700">${nomes || 'N/A'}</td>
+          <td class="py-4 px-3">
+            <select onchange="alterarStatus(${a.id}, this.value)" class="text-xs font-bold p-2 rounded-lg border focus:outline-none ${st === 'cancelado' ? 'bg-red-50 text-red-700 border-red-300' : (st === 'concluido' ? 'bg-green-50 text-green-700 border-green-300' : 'bg-amber-50 text-amber-700 border-amber-300')}">
+              <option value="pendente" ${st === 'pendente' ? 'selected' : ''}>⏳ Pendente</option>
+              <option value="concluido" ${st === 'concluido' ? 'selected' : ''}>✅ Concluído</option>
+              <option value="cancelado" ${st === 'cancelado' ? 'selected' : ''}>❌ Cancelado</option>
+            </select>
+          </td>
+          <td class="py-4 px-3 text-right">
+            <button onclick="gerarPDF(${a.id})" class="text-xs font-bold bg-amber-50 text-gold-500 border border-gold-300 px-2.5 py-1.5 rounded-lg hover:bg-gold-300/20 whitespace-nowrap">PDF</button>
+          </td>
+        </tr>`;
+    }
+
+    function atualizarTelas() {
+      const hojeStr = obterDataHojeLocal();
+      const opcoesData = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('data-hoje').innerText = new Date().toLocaleDateString('pt-BR', opcoesData);
+
+      const agendamentosHoje = db.agendamentos
+        .filter(a => a.data === hojeStr)
+        .sort((a, b) => horaParaMinutos(a.hora) - horaParaMinutos(b.hora));
+
+      document.getElementById('metric-hoje').innerText = agendamentosHoje.length;
+      document.getElementById('metric-pacientes').innerText = db.clientes.length;
+      
+      const filtroPeriodo = document.getElementById('filtro-periodo-receita')?.value || 'mes';
+      const receitaFiltrada = db.agendamentos.reduce((acc, a) => {
+        if (a.status === 'cancelado') return acc;
+        if (!ehAgendamentoNoPeriodo(a.data, filtroPeriodo)) return acc;
+
+        const servicos = obterServicosDoAgendamento(a);
+        const subtotal = servicos.reduce((sub, s) => sub + parseFloat(s.preco), 0);
+        return acc + subtotal;
+      }, 0);
+
+      document.getElementById('metric-receita').innerText = receitaOculta 
+        ? '••••••••' 
+        : `R$ ${receitaFiltrada.toFixed(2)}`;
+
+      const containerHoje = document.getElementById('container-agenda-hoje');
+      if (agendamentosHoje.length === 0) {
+        containerHoje.innerHTML = `
+          <div class="text-center py-12">
+            <span class="text-4xl text-gold-400 block mb-3">✦</span>
+            <p class="font-bold text-lg text-neutral-800">Nenhum agendamento hoje</p>
+            <p class="text-sm text-neutral-500 mt-1">Aproveite para revisar prontuários ou cadastrar novos pacientes.</p>
+          </div>`;
+      } else {
+        containerHoje.innerHTML = agendamentosHoje.map(a => {
+          const c = db.clientes.find(item => item.id == a.clienteId);
+          const servicos = obterServicosDoAgendamento(a);
+          const nomes = servicos.map(s => s.nome).join(', ');
+          const duracaoTotal = calcularDuracaoTotalAgendamento(a);
+          const horaFim = minutosParaHora(horaParaMinutos(a.hora) + duracaoTotal);
+          const statusTxt = (a.status || 'pendente').toUpperCase();
+          const badgeClass = a.status === 'cancelado' ? 'bg-red-100 text-red-700' : (a.status === 'concluido' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700');
+          return `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between py-4 border-b border-neutral-100 gap-2">
+              <div>
+                <div class="flex items-center gap-2">
+                  <p class="font-bold text-base text-neutral-900">${c ? c.nome : 'N/A'}</p>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeClass}">${statusTxt}</span>
+                </div>
+                <p class="text-sm text-neutral-500">${nomes || 'N/A'} • <span class="font-bold text-neutral-800">${a.hora} às ${horaFim}</span></p>
+              </div>
+              <button onclick="gerarPDF(${a.id})" class="text-xs font-bold text-gold-500 border border-gold-400 px-3 py-1.5 rounded-lg hover:bg-gold-300/10 self-start sm:self-auto">PDF</button>
+            </div>`;
+        }).join('');
+      }
+
+      const selectC = document.getElementById('agenda-cliente');
+      const selectFotoC = document.getElementById('foto-cliente');
+      const selectS = document.getElementById('agenda-servico');
+
+      const optionsClientes = '<option value="">Selecione o Paciente...</option>' + db.clientes.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+      selectC.innerHTML = optionsClientes;
+      if (selectFotoC) selectFotoC.innerHTML = optionsClientes;
+
+      selectS.innerHTML = db.servicos.map(s => `<option value="${s.id}" class="py-1 px-2">${s.nome} (${formatarDuracao(s.duracao)}) - R$ ${s.preco}</option>`).join('');
+
+      const termoProcedimento = (document.getElementById('busca-procedimento')?.value || '').toLowerCase();
+      const servicosFiltrados = db.servicos.filter(s => s.nome.toLowerCase().includes(termoProcedimento));
+
+      document.getElementById('lista-procedimentos').innerHTML = servicosFiltrados.length > 0 
+        ? servicosFiltrados.map(s => `
+          <div class="py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            <div>
+              <p class="font-bold text-base text-neutral-900">${s.nome}</p>
+              <p class="text-sm text-neutral-500">${formatarDuracao(s.duracao)}</p>
+            </div>
+            <div class="flex items-center justify-between sm:justify-end gap-3 sm:gap-5">
+              <span class="font-serif text-xl font-bold text-neutral-900">R$ ${s.preco}</span>
+              <div class="flex gap-2">
+                <button onclick="editarServico(${s.id})" class="text-xs sm:text-sm font-bold text-neutral-700 hover:text-black bg-neutral-100 px-3 py-1.5 rounded-lg">Editar</button>
+                <button onclick="excluirServico(${s.id})" class="text-xs sm:text-sm font-bold text-red-600 hover:text-red-800 px-2 py-1.5">Excluir</button>
+              </div>
+            </div>
+          </div>`).join('')
+        : '<p class="text-sm text-neutral-500 py-4">Nenhum procedimento encontrado.</p>';
+
+      const termoPaciente = (document.getElementById('busca-paciente')?.value || '').toLowerCase();
+      const clientesFiltrados = db.clientes.filter(c => 
+        c.nome.toLowerCase().includes(termoPaciente) || 
+        c.telefone.toLowerCase().includes(termoPaciente)
+      );
+
+      document.getElementById('lista-pacientes').innerHTML = clientesFiltrados.length > 0 
+        ? clientesFiltrados.map(c => `
+          <div class="py-4 hover:bg-bege-100 px-3 rounded-xl transition flex justify-between items-center group">
+            <div onclick="abrirModalPaciente(${c.id})" class="cursor-pointer flex-1">
+              <p class="font-bold text-base text-neutral-900 group-hover:text-gold-500 transition">${c.nome} <span class="text-sm font-normal text-neutral-500 block sm:inline">(${c.telefone})</span></p>
+              <div class="text-sm text-neutral-600 mt-1 whitespace-pre-wrap">${c.prontuario || 'Sem observações cadastradas'}</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="abrirModalPaciente(${c.id})" class="text-xs text-gold-500 font-bold hover:underline px-2 py-1">Opções →</button>
+            </div>
+          </div>`).join('')
+        : '<p class="text-sm text-neutral-500 py-4">Nenhum paciente encontrado.</p>';
+
+      const agendamentosPendentes = db.agendamentos
+        .filter(a => a.status !== 'concluido')
+        .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
+
+      document.getElementById('tabela-agendamentos').innerHTML = agendamentosPendentes.length > 0
+        ? agendamentosPendentes.map(renderizarLinhaAgendamento).join('')
+        : '<tr><td colspan="5" class="py-6 text-center text-sm text-neutral-500">Nenhum agendamento pendente.</td></tr>';
+
+      const agendamentosConcluidos = db.agendamentos
+        .filter(a => a.status === 'concluido')
+        .sort((a, b) => (b.data + b.hora).localeCompare(a.data + a.hora));
+
+      document.getElementById('tabela-concluidos').innerHTML = agendamentosConcluidos.length > 0
+        ? agendamentosConcluidos.map(renderizarLinhaAgendamento).join('')
+        : '<tr><td colspan="5" class="py-6 text-center text-sm text-neutral-500">Nenhum procedimento concluído ainda.</td></tr>';
+
+      // ATUALIZAÇÃO DA SEÇÃO DE PRODUTOS
+      const totalInvestido = db.produtos.reduce((acc, p) => acc + (p.custoTotal || 0), 0);
+      const totalVenda = db.produtos.reduce((acc, p) => acc + (p.valorVenda || 0), 0);
+      const lucroTotal = db.produtos.reduce((acc, p) => acc + (p.lucro || 0), 0);
+
+      document.getElementById('prod-total-investido').innerText = `R$ ${totalInvestido.toFixed(2)}`;
+      document.getElementById('prod-total-venda').innerText = `R$ ${totalVenda.toFixed(2)}`;
+      document.getElementById('prod-lucro-total').innerText = `R$ ${lucroTotal.toFixed(2)}`;
+
+      const tabelaProds = document.getElementById('tabela-produtos');
+      if (db.produtos.length === 0) {
+        tabelaProds.innerHTML = '<tr><td colspan="10" class="py-6 text-center text-neutral-500">Nenhum produto cadastrado.</td></tr>';
+      } else {
+        tabelaProds.innerHTML = db.produtos.map(p => `
+          <tr class="hover:bg-amber-50/50 transition border-b border-neutral-100">
+            <td class="py-3 px-3">${p.data.split('-').reverse().join('/')}</td>
+            <td class="py-3 px-3">${p.nota || '-'}</td>
+            <td class="py-3 px-3 font-bold text-neutral-900">${p.nome}</td>
+            <td class="py-3 px-3">R$ ${p.compra.toFixed(2)}</td>
+            <td class="py-3 px-3">R$ ${p.frete.toFixed(2)}</td>
+            <td class="py-3 px-3">R$ ${p.insumos.toFixed(2)}</td>
+            <td class="py-3 px-3 font-bold text-amber-900">R$ ${p.custoTotal.toFixed(2)}</td>
+            <td class="py-3 px-3 font-bold text-neutral-900">R$ ${p.valorVenda.toFixed(2)}</td>
+            <td class="py-3 px-3 font-bold text-green-700">R$ ${p.lucro.toFixed(2)}</td>
+            <td class="py-3 px-3 text-center">
+              <button onclick="excluirProduto(${p.id})" class="bg-red-500 hover:bg-red-600 text-white font-bold px-3 py-1 rounded-lg text-xs transition">Excluir</button>
+            </td>
+          </tr>`).join('');
+      }
+
+      // ATUALIZAÇÃO DA GALERIA DE FOTOS
+      const termoFoto = (document.getElementById('busca-foto')?.value || '').toLowerCase();
+      const fotosFiltradas = db.fotos.filter(f => {
+        const cliente = db.clientes.find(c => c.id == f.clienteId);
+        const nomeCliente = cliente ? cliente.nome.toLowerCase() : '';
+        const produto = f.produtoNome.toLowerCase();
+        return nomeCliente.includes(termoFoto) || produto.includes(termoFoto);
+      });
+
+      const gridFotos = document.getElementById('grid-fotos');
+      if (fotosFiltradas.length === 0) {
+        gridFotos.innerHTML = '<p class="text-sm text-neutral-500 col-span-full py-6 text-center">Nenhuma foto encontrada.</p>';
+      } else {
+        gridFotos.innerHTML = fotosFiltradas.map(f => {
+          const c = db.clientes.find(item => item.id == f.clienteId);
+          return `
+            <div class="bg-white rounded-xl overflow-hidden border border-neutral-200 shadow-sm hover:shadow-md transition flex flex-col group">
+              <div class="relative h-44 overflow-hidden bg-neutral-900 cursor-pointer" onclick="abrirModalFoto(${f.id})">
+                <img src="${f.imagem}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="Foto procedimento">
+                <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold">Clique para ampliar 🔍</div>
+              </div>
+              <div class="p-3 flex-1 flex flex-col justify-between">
+                <div>
+                  <p class="font-bold text-sm text-neutral-900">${c ? c.nome : 'N/A'}</p>
+                  <p class="text-xs text-amber-800 font-semibold">${f.produtoNome}</p>
+                  <p class="text-[11px] text-neutral-400 mt-1">${f.data.split('-').reverse().join('/')}</p>
+                </div>
+                <div class="mt-3 pt-2 border-t flex justify-between items-center">
+                  <button onclick="abrirModalFoto(${f.id})" class="text-xs text-gold-500 font-bold hover:underline">Ver Detalhes</button>
+                  <button onclick="excluirFoto(${f.id})" class="text-xs text-red-500 font-bold hover:underline">Excluir</button>
+                </div>
+              </div>
+            </div>`;
+        }).join('');
+      }
+    }
+
+    document.getElementById('agenda-data').value = obterDataHojeLocal();
+    document.getElementById('prod-data').value = obterDataHojeLocal();
+    document.getElementById('foto-data').value = obterDataHojeLocal();
+
+    atualizarTelas();
+  </script>
+</body>
+</html>
