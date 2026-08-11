@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerador de Orçamento - Clau Estética</title>
+  <style>
+    :root {
+      --primary-color: #a37547;
+      --primary-hover: #8c6138;
+      --bg-color: #f4f1ea;
+      --card-bg: #ffffff;
+      --text-color: #4a4a4a;
+      --border-color: #d1c7bd;
+      --gold-line: #c5a059;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      gap: 20px;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .sidebar {
+      width: 340px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Formulário Lateral */
+    .form-card {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      width: 340px;
+      flex-shrink: 0;
+      height: fit-content;
+    }
+
+    .form-card h2 {
+      color: var(--primary-color);
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+    }
+
+    .divider {
+      height: 2px;
+      background-color: var(--gold-line);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #666;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      color: #333;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--primary-color);
+    }
+
+    .form-group textarea {
+      min-height: 64px;
+      resize: vertical;
+    }
+
+    .btn-print {
+      width: 100%;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+
+    .btn-print:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-save {
+      width: 100%;
+      background: transparent;
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-save:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .btn-add-service {
+      width: 100%;
+      color: var(--primary-color);
+      background: #fdfcf9;
+      border: 1px dashed var(--primary-color);
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .custom-service-form {
+      margin-top: 10px;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      background: #fafafa;
+    }
+
+    .custom-service-form .form-group {
+      margin-bottom: 10px;
+    }
+
+    .custom-service-form .btn-save {
+      margin-top: 0;
+    }
+
+    .history-card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .history-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .history-heading h3 {
+      color: var(--primary-color);
+      font-size: 0.95rem;
+    }
+
+    .history-select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: #333;
+      background: white;
+      outline: none;
+    }
+
+    .history-select:focus {
+      border-color: var(--primary-color);
+    }
+
+    .history-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn-history {
+      flex: 1;
+      border: 1px solid var(--primary-color);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--primary-color);
+      padding: 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-history:hover:not(:disabled) {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .btn-history.delete {
+      border-color: #b55;
+      color: #a33;
+    }
+
+    .btn-history.delete:hover:not(:disabled) {
+      background: #a33;
+      color: white;
+    }
+
+    .btn-history:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    .btn-clear {
+      color: #777;
+      background: none;
+      border: 0;
+      cursor: pointer;
+      font-size: 0.75rem;
+      text-decoration: underline;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 270px;
+      overflow-y: auto;
+      padding-right: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary-color) #f4f1ea;
+    }
+
+    .history-list::-webkit-scrollbar {
+      width: 7px;
+    }
+
+    .history-list::-webkit-scrollbar-track {
+      background: #f4f1ea;
+      border-radius: 8px;
+    }
+
+    .history-list::-webkit-scrollbar-thumb {
+      background: var(--primary-color);
+      border-radius: 8px;
+    }
+
+    .history-empty {
+      color: #777;
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #fafafa;
+    }
+
+    .history-load {
+      flex: 1;
+      min-width: 0;
+      padding: 9px 10px;
+      border: 0;
+      background: transparent;
+      color: var(--text-color);
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .history-load:hover {
+      background: #f4f1ea;
+    }
+
+    .history-name, .history-meta {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .history-name {
+      color: var(--primary-color);
+      font-size: 0.82rem;
+      font-weight: bold;
+      margin-bottom: 3px;
+    }
+
+    .history-meta {
+      color: #666;
+      font-size: 0.72rem;
+    }
+
+    .history-pdf {
+      width: 42px;
+      border: 0;
+      border-left: 1px solid var(--border-color);
+      background: transparent;
+      color: var(--primary-color);
+      cursor: pointer;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+
+    .history-pdf:hover {
+      background: #f4f1ea;
+    }
+
+    .history-delete {
+      width: 34px;
+      border: 0;
+      border-left: 1px solid var(--border-color);
+      background: transparent;
+      color: #777;
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+
+    .history-delete:hover {
+      background: #f9e8e8;
+      color: #a33;
+    }
+
+    /* Documento Preview / Folha */
+    .preview-container {
+      flex-grow: 1;
+      background: var(--card-bg);
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      max-width: 800px;
+    }
+
+    /* Cabeçalho da Proposta */
+    .logo-area {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .logo-area .brand {
+      font-size: 1.8rem;
+      color: var(--primary-color);
+      font-family: 'Georgia', serif;
+      letter-spacing: 1px;
+    }
+
+    .logo-area .sub-brand {
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      color: #888;
+      text-transform: uppercase;
+    }
+
+    .doc-title {
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      letter-spacing: 1px;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    .doc-title span {
+      background-color: #3b82f6;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.9rem;
+    }
+
+    /* Tabela de Dados */
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      margin-bottom: 25px;
+      border: 1px solid var(--border-color);
+    }
+
+    .info-table td {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      font-size: 0.9rem;
+    }
+
+    .info-table td.label {
+      font-weight: bold;
+      color: var(--primary-color);
+      width: 25%;
+      text-transform: uppercase;
+    }
+
+    /* Seções */
+    .section-header {
+      color: var(--primary-color);
+      font-weight: bold;
+      font-size: 0.95rem;
+      border-left: 4px solid var(--primary-color);
+      padding-left: 8px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .section-box {
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 20px;
+      background-color: #fafafa;
+    }
+
+    .section-box ul {
+      padding-left: 20px;
+    }
+
+    .section-box li {
+      font-size: 0.88rem;
+      margin-bottom: 6px;
+      line-height: 1.4;
+      color: #444;
+    }
+
+    /* Caixa do Valor Total */
+    .price-box {
+      border: 1px solid var(--gold-line);
+      border-radius: 6px;
+      padding: 20px;
+      text-align: center;
+      background-color: #fdfcf9;
+    }
+
+    .price-box .price-title {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      letter-spacing: 1px;
+    }
+
+    .price-box .price-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin: 5px 0;
+    }
+
+    .price-box .price-sub {
+      font-size: 0.8rem;
+      color: #777;
+      font-style: italic;
+      margin-bottom: 15px;
+    }
+
+    .payment-methods {
+      text-align: left;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 12px;
+      font-size: 0.8rem;
+      color: #555;
+    }
+
+    .payment-methods strong {
+      color: var(--primary-color);
+    }
+
+    /* Ajustes para Impressão / PDF */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .form-card {
+        display: none;
+      }
+      .sidebar {
+        display: none;
+      }
+      .container {
+        width: 100%;
+        max-width: 100%;
+      }
+      .preview-container {
+        box-shadow: none;
+        padding: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- FORMULÁRIO -->
+  <div class="sidebar">
+  <div class="form-card">
+    <h2>Gerador de Orçamento</h2>
+    <div class="divider"></div>
+    
+    <div class="form-group">
+      <label>Nome da Paciente</label>
+      <input type="text" id="inpPaciente" value="Jarilene" oninput="atualizarPreview()">
+    </div>
+
+    <div class="form-group">
+      <label>Data</label>
+      <input type="date" id="inpData" onchange="atualizarPreview()">
+    </div>
+
+    <div class="form-group">
+      <label>Serviço</label>
+      <select id="inpServico" onchange="selecionarServico()">
+        <!-- Preenchido via JS -->
+      </select>
+      <button type="button" class="btn-add-service" onclick="alternarFormularioServico()">+ Adicionar serviço</button>
+
+      <div class="custom-service-form" id="formNovoServico" hidden>
+        <div class="form-group">
+          <label>Nome do serviço</label>
+          <input type="text" id="inpNovoServicoNome" placeholder="Ex.: Massagem Relaxante">
+        </div>
+        <div class="form-group">
+          <label>Descrição</label>
+          <textarea id="inpNovoServicoDescricao" placeholder="Resumo do procedimento"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Conduta e estratégia</label>
+          <textarea id="inpNovoServicoEstrategia" placeholder="Etapas e orientações do atendimento"></textarea>
+        </div>
+        <button type="button" class="btn-save" onclick="salvarServicoPersonalizado()">Salvar serviço</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Agenda / Disponibilidade</label>
+      <input type="text" id="inpAgenda" value="Sábados e Domingos" oninput="atualizarPreview()">
+    </div>
+
+    <div class="form-group">
+      <label>Número de Sessões</label>
+      <input type="number" id="inpSessoes" value="5" min="1" oninput="atualizarPreview()">
+    </div>
+
+    <div class="form-group">
+      <label>Valor por Sessão (R$)</label>
+      <input type="number" id="inpValorSessao" value="260" min="0" step="10" oninput="atualizarPreview()">
+    </div>
+
+    <button class="btn-print" onclick="gerarPdfAtual()">Gerar PDF</button>
+    <button type="button" class="btn-save" onclick="salvarProposta()">Salvar em propostas enviadas</button>
+
+  </div>
+
+  <div class="history-card">
+      <div class="history-heading">
+        <h3>Propostas enviadas</h3>
+        <button type="button" class="btn-clear" id="btnLimparHistorico" onclick="limparHistorico()" hidden>Limpar</button>
+      </div>
+      <select class="history-select" id="selectHistorico" onchange="selecionarPropostaHistorico()">
+        <option value="">Nenhuma proposta salva</option>
+      </select>
+      <div class="history-actions">
+        <button type="button" class="btn-history" id="btnPdfHistorico" onclick="gerarPdfSelecionado()" disabled>Gerar PDF</button>
+        <button type="button" class="btn-history delete" id="btnExcluirHistorico" onclick="excluirPropostaSelecionada()" disabled>Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREVIEW DA PROPOSTA -->
+  <div class="preview-container">
+    <div class="logo-area">
+      <div class="brand">Clau Estética</div>
+      <div class="sub-brand">ENFERMEIRA</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="doc-title">
+      Proposta de Atendimento
+    </div>
+
+    <table class="info-table">
+      <tr>
+        <td class="label">Paciente:</td>
+        <td id="outPaciente">Jarilene</td>
+      </tr>
+      <tr>
+        <td class="label">Data:</td>
+        <td id="outData">05/08/2026</td>
+      </tr>
+      <tr>
+        <td class="label">Serviço:</td>
+        <td id="outServico">Drenagem Linfática</td>
+      </tr>
+      <tr>
+        <td class="label">Agenda:</td>
+        <td id="outAgenda">Sábados e Domingos</td>
+      </tr>
+    </table>
+
+    <div class="section-header" id="outHeaderPlano">PLANO DE ATENDIMENTO (5 SESSÕES)</div>
+    <div class="section-box">
+      <ul id="outListaPlano">
+        <!-- Preenchido via JS -->
+      </ul>
+    </div>
+
+    <div class="section-header">CONDIÇÕES DO ATENDIMENTO</div>
+    <div class="section-box">
+      <ul>
+        <li><strong>Deslocamento:</strong> O valor do transporte/passagem até o local já está incluso no orçamento total.</li>
+        <li><strong>Autorização Médica:</strong> O início dos atendimentos de recuperação é mediante autorização/liberação prévia do seu médico (quando aplicável).</li>
+        <li><strong>Agendamento:</strong> As sessões serão realizadas conforme disponibilidade combinada prévia.</li>
+      </ul>
+    </div>
+
+    <div class="price-box">
+      <div class="price-title">VALOR TOTAL DO PACOTE</div>
+      <div class="price-value" id="outValorTotal">R$ 1.300,00</div>
+      <div class="price-sub" id="outValorDetalhe">(5 sessões de R$ 260,00)</div>
+
+      <div class="payment-methods">
+        <p><strong>Formas de Pagamento:</strong></p>
+        <p>• PIX ou Transferência Bancária.</p>
+        <p>• Cartão de Crédito: Possibilidade de parcelamento na mequininha (com juros inclusos/aplicados conforme número de parcelas escolhido).</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Banco de Dados dos Serviços
+  const catalogos = [
+    {
+      id: "drenagem_pos_operatoria",
+      nome: "Drenagem Linfática Pós-Operatória",
+      descricao: "Técnica manual adaptada ao pós-operatório para auxiliar na redução de edema, no conforto e na recuperação dos tecidos.",
+      estrategia: "Avaliação individualizada, manobras suaves respeitando a fase de recuperação e orientações conforme liberação médica."
+    },
+    {
+      id: "drenagem",
+      nome: "Drenagem Linfática",
+      descricao: "Técnica manual suave para redução de edema, melhora circulatória e eliminação de toxinas.",
+      estrategia: "Avaliação do grau de edema, manobras sequenciais de evacuação/captação e orientações pós-procedimento."
+    },
+    {
+      id: "botox",
+      nome: "Toxina Botulínica (Botox)",
+      descricao: "Aplicação injetável para bloqueio neuromuscular temporário, amenizando rugas dinâmicas e linhas de expressão.",
+      estrategia: "Análise da dinâmica facial, marcação de pontos anatômicos, aplicação e retorno em 15 dias para avaliação/retoque."
+    },
+    {
+      id: "limpeza",
+      nome: "Limpeza de Pele",
+      descricao: "Remoção profunda de impurezas, cravos e células mortas, desobstruindo poros e renovando a saúde cutânea.",
+      estrategia: "Higienização, vapor de ozônio, extração, alta frequência (bactericida) e máscara calmante com protetor solar."
+    },
+    {
+      id: "bioestimulador",
+      nome: "Bioestimulador de Colágeno",
+      descricao: "Injetável biocompatível para estimular a síntese de colágeno e restaurar a firmeza da pele.",
+      estrategia: "Mapeamento dos vetores de firmeza, aplicação com microcânula e orientações de massagens domiciliares."
+    },
+    {
+      id: "preenchedor",
+      nome: "Preenchedor Labial",
+      descricao: "Ácido hialurônico para redefinir contornos, reestabelecer volume e hidratar a região dos lábios.",
+      estrategia: "Anestesia local/tópica, preenchimento progressivo respeitando a harmonia e revisão após 15 dias."
+    },
+    {
+      id: "peim",
+      nome: "PEIM - Microvasos",
+      descricao: "Escleroterapia de microvarizes e telangiectasias via microinjeção de solução hipertônica.",
+      estrategia: "Mapeamento vascular, microinjeções pontuais com agulha ultrafina e orientações sobre cuidados e compressão."
+    },
+    {
+      id: "microagulhamento",
+      nome: "Microagulhamento",
+      descricao: "Indução Percutânea de Colágeno com microagulhas para regeneração tecidual e drug delivery.",
+      estrategia: "Anestesia tópica, microagulhamento estéril e aplicação imediata de ativos regeneradores concentrados."
+    },
+    {
+      id: "microagulhamento_ghk",
+      nome: "Microagulhamento com GHK-Cu",
+      descricao: "Microagulhamento associado a Peptídeo de Cobre para potente ação antioxidante, cicatrizante e firmeza.",
+      estrategia: "Microagulhamento combinado com permeação do ativo estéril GHK-Cu e finalização de alta hidratação."
+    },
+    {
+      id: "fios_pdo",
+      nome: "Fios de PDO",
+      descricao: "Inserção de fios biodegradáveis para efeito de tração (lifting) ou bioestímulo contínuo de colágeno.",
+      estrategia: "Planejamento anatômico, anestesia local, implantação via microcânula e orientações de repouso facial."
+    }
+  ];
+
+  const CHAVE_HISTORICO_PROPOSTAS = 'clauEstetica.propostasEnviadas';
+
+  function obterHistorico() {
+    try {
+      const historico = JSON.parse(localStorage.getItem(CHAVE_HISTORICO_PROPOSTAS)) || [];
+      return Array.isArray(historico) ? historico : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function salvarHistorico(historico) {
+    localStorage.setItem(CHAVE_HISTORICO_PROPOSTAS, JSON.stringify(historico.slice(0, 50)));
+  }
+
+  const CHAVE_SERVICOS_PERSONALIZADOS = 'clauEstetica.servicosPersonalizados';
+
+  function obterServicosPersonalizados() {
+    try {
+      const servicos = JSON.parse(localStorage.getItem(CHAVE_SERVICOS_PERSONALIZADOS)) || [];
+      return Array.isArray(servicos) ? servicos : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function carregarServicosPersonalizados() {
+    const idsExistentes = new Set(catalogos.map(servico => servico.id));
+    obterServicosPersonalizados().forEach(servico => {
+      if (!servico.id || !servico.nome || idsExistentes.has(servico.id)) return;
+      catalogos.push({
+        id: String(servico.id),
+        nome: String(servico.nome),
+        descricao: String(servico.descricao || 'Atendimento personalizado conforme avaliação individual.'),
+        estrategia: String(servico.estrategia || 'Conduta individualizada e orientações após o atendimento.')
+      });
+      idsExistentes.add(servico.id);
+    });
+  }
+
+  function atualizarOpcoesServicos(idSelecionado) {
+    const valorAtual = idSelecionado || selectServico.value;
+    selectServico.innerHTML = '';
+
+    catalogos.forEach(servico => {
+      const opcao = document.createElement('option');
+      opcao.value = servico.id;
+      opcao.textContent = servico.nome;
+      selectServico.appendChild(opcao);
+    });
+
+    if (catalogos.some(servico => servico.id === valorAtual)) {
+      selectServico.value = valorAtual;
+    }
+  }
+
+  function alternarFormularioServico() {
+    const formulario = document.getElementById('formNovoServico');
+    formulario.hidden = !formulario.hidden;
+    if (!formulario.hidden) document.getElementById('inpNovoServicoNome').focus();
+  }
+
+  function salvarServicoPersonalizado() {
+    const nome = document.getElementById('inpNovoServicoNome').value.trim();
+    const descricao = document.getElementById('inpNovoServicoDescricao').value.trim();
+    const estrategia = document.getElementById('inpNovoServicoEstrategia').value.trim();
+
+    if (!nome) {
+      alert('Informe o nome do serviço.');
+      return;
+    }
+
+    if (catalogos.some(servico => servico.nome.toLocaleLowerCase('pt-BR') === nome.toLocaleLowerCase('pt-BR'))) {
+      alert('Este serviço já está cadastrado.');
+      return;
+    }
+
+    const novoServico = {
+      id: `personalizado_${Date.now()}`,
+      nome,
+      descricao: descricao || `Atendimento de ${nome} conforme avaliação individual.`,
+      estrategia: estrategia || 'Conduta individualizada e orientações após o atendimento.'
+    };
+
+    const servicosPersonalizados = obterServicosPersonalizados();
+    servicosPersonalizados.push(novoServico);
+    localStorage.setItem(CHAVE_SERVICOS_PERSONALIZADOS, JSON.stringify(servicosPersonalizados));
+    catalogos.push(novoServico);
+    atualizarOpcoesServicos(novoServico.id);
+
+    document.getElementById('inpNovoServicoNome').value = '';
+    document.getElementById('inpNovoServicoDescricao').value = '';
+    document.getElementById('inpNovoServicoEstrategia').value = '';
+    document.getElementById('formNovoServico').hidden = true;
+    atualizarPreview();
+  }
+
+  function escaparHtml(texto) {
+    return String(texto ?? '').replace(/[&<>"']/g, caractere => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    })[caractere]);
+  }
+
+  function formatarData(data) {
+    if (!data) return 'Sem data';
+    const partes = data.split('-');
+    return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : data;
+  }
+
+  function formatarValor(valor) {
+    return Number(valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  function codificarTextoPdf(texto) {
+    const caracteresWinAnsi = {
+      'À': 'C0', 'Á': 'C1', 'Â': 'C2', 'Ã': 'C3', 'Ä': 'C4', 'Å': 'C5', 'Ç': 'C7',
+      'È': 'C8', 'É': 'C9', 'Ê': 'CA', 'Ë': 'CB', 'Ì': 'CC', 'Í': 'CD', 'Î': 'CE',
+      'Ï': 'CF', 'Ñ': 'D1', 'Ò': 'D2', 'Ó': 'D3', 'Ô': 'D4', 'Õ': 'D5', 'Ö': 'D6',
+      'Ù': 'D9', 'Ú': 'DA', 'Û': 'DB', 'Ü': 'DC', 'à': 'E0', 'á': 'E1', 'â': 'E2',
+      'ã': 'E3', 'ä': 'E4', 'ç': 'E7', 'è': 'E8', 'é': 'E9', 'ê': 'EA', 'ë': 'EB',
+      'ì': 'EC', 'í': 'ED', 'î': 'EE', 'ï': 'EF', 'ñ': 'F1', 'ò': 'F2', 'ó': 'F3',
+      'ô': 'F4', 'õ': 'F5', 'ö': 'F6', 'ù': 'F9', 'ú': 'FA', 'û': 'FB', 'ü': 'FC',
+      'º': 'BA', 'ª': 'AA', '°': 'B0', '€': '80', '•': '95', '–': '96', '—': '97',
+      '“': '93', '”': '94', '‘': '91', '’': '92', ' ': 'A0'
+    };
+
+    return Array.from(String(texto ?? '')).map(caractere => {
+      const codigo = caractere.charCodeAt(0);
+      if (codigo >= 32 && codigo <= 126) return codigo.toString(16).padStart(2, '0');
+      return caracteresWinAnsi[caractere] || '3F';
+    }).join('').toUpperCase();
+  }
+
+  function corPdf(hex) {
+    const valor = hex.replace('#', '');
+    return [0, 2, 4].map(indice => (parseInt(valor.slice(indice, indice + 2), 16) / 255).toFixed(3)).join(' ');
+  }
+
+  function quebrarTextoPdf(texto, tamanho, largura) {
+    const limite = Math.max(22, Math.floor(largura / (tamanho * 0.52)));
+    const palavras = String(texto).trim().split(/\s+/);
+    const linhas = [];
+    let linha = '';
+
+    palavras.forEach(palavra => {
+      const candidata = linha ? `${linha} ${palavra}` : palavra;
+      if (candidata.length > limite && linha) {
+        linhas.push(linha);
+        linha = palavra;
+      } else {
+        linha = candidata;
+      }
+    });
+
+    if (linha) linhas.push(linha);
+    return linhas;
+  }
+
+  function criarPdfProposta(proposta) {
+    const larguraPagina = 595;
+    const alturaPagina = 842;
+    const comandos = ['1 1 1 rg 0 0 595 842 re f'];
+
+    const adicionarTexto = (texto, x, topo, tamanho = 10, negrito = false, cor = '#4A4A4A') => {
+      const y = alturaPagina - topo;
+      comandos.push(`BT /${negrito ? 'F2' : 'F1'} ${tamanho} Tf ${corPdf(cor)} rg 1 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)} Tm <${codificarTextoPdf(texto)}> Tj ET`);
+    };
+
+    const adicionarLinha = (x1, topo1, x2, topo2, cor = '#C5A059', espessura = 1) => {
+      comandos.push(`${corPdf(cor)} RG ${espessura} w ${x1} ${alturaPagina - topo1} m ${x2} ${alturaPagina - topo2} l S`);
+    };
+
+    const adicionarRetangulo = (x, topo, largura, altura, preenchimento = null, borda = null) => {
+      const y = alturaPagina - topo - altura;
+      if (preenchimento) comandos.push(`${corPdf(preenchimento)} rg ${x} ${y} ${largura} ${altura} re f`);
+      if (borda) comandos.push(`${corPdf(borda)} RG 0.7 w ${x} ${y} ${largura} ${altura} re S`);
+    };
+
+    const adicionarTextoQuebrado = (texto, x, topo, largura, tamanho = 9, negrito = false, cor = '#4A4A4A') => {
+      const linhas = quebrarTextoPdf(texto, tamanho, largura);
+      linhas.forEach((linha, indice) => adicionarTexto(linha, x, topo + (indice * (tamanho + 3)), tamanho, negrito, cor));
+      return linhas.length * (tamanho + 3);
+    };
+
+    const dadosServico = catalogos.find(item => item.id === proposta.servicoId) || {};
+    const sessoes = Number(proposta.sessoes) || 1;
+    const valorSessao = Number(proposta.valorSessao) || 0;
+    const total = Number(proposta.total ?? (sessoes * valorSessao));
+    const ePosOperatorio = proposta.servicoId === 'drenagem_pos_operatoria';
+    const nomeServico = proposta.servico || dadosServico.nome || 'Serviço não informado';
+
+    adicionarTexto('Clau Estética', 224, 47, 20, false, '#A37547');
+    adicionarTexto('ENFERMEIRA', 264, 64, 7, false, '#777777');
+    adicionarLinha(45, 79, 550, 79);
+    adicionarTexto('PROPOSTA DE ATENDIMENTO', 196, 106, 12, true, '#A37547');
+
+    const topoTabela = 124;
+    const alturaLinha = 24;
+    const linhasDados = [
+      ['PACIENTE:', proposta.paciente || 'Paciente não informado'],
+      ['DATA:', formatarData(proposta.data)],
+      ['SERVIÇO:', nomeServico],
+      ['AGENDA:', proposta.agenda || 'Não informada']
+    ];
+
+    adicionarRetangulo(45, topoTabela, 505, alturaLinha * linhasDados.length, '#FFFFFF', '#D1C7BD');
+    adicionarLinha(150, topoTabela, 150, topoTabela + (alturaLinha * linhasDados.length), '#D1C7BD', 0.7);
+    linhasDados.forEach((linha, indice) => {
+      const y = topoTabela + 16 + (indice * alturaLinha);
+      if (indice > 0) adicionarLinha(45, topoTabela + (indice * alturaLinha), 550, topoTabela + (indice * alturaLinha), '#D1C7BD', 0.7);
+      adicionarTexto(linha[0], 55, y, 8, true, '#A37547');
+      adicionarTextoQuebrado(linha[1], 160, y, 375, 8, false, '#4A4A4A');
+    });
+
+    let topoAtual = topoTabela + (alturaLinha * linhasDados.length) + 35;
+    adicionarTexto(`PLANO DE ATENDIMENTO RESUMIDO (${sessoes} ${sessoes === 1 ? 'SESSÃO' : 'SESSÕES'})`, 45, topoAtual, 10, true, '#A37547');
+    topoAtual += 14;
+
+    const itensPlano = [
+      `• Procedimento: ${nomeServico} - ${dadosServico.descricao || ''}`,
+      `• Conduta e Estratégia: ${dadosServico.estrategia || ''}`
+    ];
+    if (ePosOperatorio) itensPlano.push('• Atendimento Domiciliar: Conforto e segurança no seu espaço, com material esterilizado e conduta individualizada.');
+
+    const linhasPlano = itensPlano.flatMap(item => quebrarTextoPdf(item, 8.5, 465));
+    const alturaPlano = 18 + (linhasPlano.length * 12);
+    adicionarRetangulo(45, topoAtual, 505, alturaPlano, '#FAFAFA', '#D1C7BD');
+    linhasPlano.forEach((linha, indice) => adicionarTexto(linha, 58, topoAtual + 15 + (indice * 12), 8.5, false, '#444444'));
+    topoAtual += alturaPlano + 25;
+
+    adicionarTexto('CONDIÇÕES DO ATENDIMENTO', 45, topoAtual, 10, true, '#A37547');
+    topoAtual += 14;
+
+    const condicoes = [];
+    if (ePosOperatorio) {
+      condicoes.push('• Deslocamento: O valor do transporte/passagem até o local já está incluso no orçamento total.');
+      condicoes.push('• Autorização Médica: O início dos atendimentos de recuperação é mediante autorização/liberação prévia do seu médico (quando aplicável).');
+    }
+    condicoes.push('• Agendamento: As sessões serão realizadas conforme disponibilidade combinada prévia.');
+
+    const linhasCondicoes = condicoes.flatMap(item => quebrarTextoPdf(item, 8.5, 465));
+    const alturaCondicoes = 18 + (linhasCondicoes.length * 12);
+    adicionarRetangulo(45, topoAtual, 505, alturaCondicoes, '#FAFAFA', '#D1C7BD');
+    linhasCondicoes.forEach((linha, indice) => adicionarTexto(linha, 58, topoAtual + 15 + (indice * 12), 8.5, false, '#444444'));
+    topoAtual += alturaCondicoes + 24;
+
+    adicionarRetangulo(45, topoAtual, 505, 114, '#FDFCF9', '#C5A059');
+    adicionarTexto('VALOR TOTAL DO PACOTE', 209, topoAtual + 22, 9, true, '#A37547');
+    adicionarTexto(formatarValor(total), 238, topoAtual + 48, 21, true, '#A37547');
+    adicionarTexto(`(${sessoes} ${sessoes === 1 ? 'sessão' : 'sessões'} de ${formatarValor(valorSessao)})`, 218, topoAtual + 65, 8, false, '#777777');
+    adicionarLinha(60, topoAtual + 78, 535, topoAtual + 78, '#D1C7BD', 0.6);
+    adicionarTexto('Formas de Pagamento:', 60, topoAtual + 93, 8, true, '#A37547');
+    adicionarTexto('PIX ou Transferência Bancária. Cartão de Crédito com parcelamento na maquininha.', 60, topoAtual + 105, 7.5, false, '#555555');
+
+    const conteudo = comandos.join('\n');
+    const objetos = [
+      '<< /Type /Catalog /Pages 2 0 R >>',
+      '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+      '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> /Contents 4 0 R >>',
+      `<< /Length ${conteudo.length} >>\nstream\n${conteudo}\nendstream`,
+      '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
+      '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>'
+    ];
+
+    let pdf = '%PDF-1.4\n%PDF\n';
+    const posicoes = [0];
+    objetos.forEach((objeto, indice) => {
+      posicoes.push(pdf.length);
+      pdf += `${indice + 1} 0 obj\n${objeto}\nendobj\n`;
+    });
+    const inicioXref = pdf.length;
+    pdf += `xref\n0 ${objetos.length + 1}\n0000000000 65535 f \n`;
+    posicoes.slice(1).forEach(posicao => {
+      pdf += `${String(posicao).padStart(10, '0')} 00000 n \n`;
+    });
+    pdf += `trailer\n<< /Size ${objetos.length + 1} /Root 1 0 R >>\nstartxref\n${inicioXref}\n%%EOF`;
+
+    return new TextEncoder().encode(pdf);
+  }
+
+  function baixarPdfProposta(proposta) {
+    const bytes = criarPdfProposta(proposta);
+    const arquivo = new Blob([bytes], { type: 'application/pdf' });
+    const link = document.createElement('a');
+    const paciente = String(proposta.paciente || 'paciente').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '');
+    link.href = URL.createObjectURL(arquivo);
+    link.download = `proposta-${paciente || 'paciente'}-${proposta.data || 'sem-data'}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  }
+
+  function gerarPdfAtual() {
+    const servicoId = document.getElementById('inpServico').value;
+    const servico = catalogos.find(item => item.id === servicoId);
+    if (!servico) return;
+
+    const sessoes = parseInt(document.getElementById('inpSessoes').value) || 1;
+    const valorSessao = parseFloat(document.getElementById('inpValorSessao').value) || 0;
+    baixarPdfProposta({
+      paciente: document.getElementById('inpPaciente').value || 'Paciente não informado',
+      data: document.getElementById('inpData').value,
+      agenda: document.getElementById('inpAgenda').value || 'Não informada',
+      servicoId,
+      servico: servico.nome,
+      sessoes,
+      valorSessao,
+      total: sessoes * valorSessao
+    });
+  }
+
+  function salvarProposta() {
+    const servicoId = document.getElementById('inpServico').value;
+    const servico = catalogos.find(item => item.id === servicoId);
+    if (!servico) return;
+
+    const sessoes = parseInt(document.getElementById('inpSessoes').value) || 1;
+    const valorSessao = parseFloat(document.getElementById('inpValorSessao').value) || 0;
+    const data = document.getElementById('inpData').value;
+    const historico = obterHistorico();
+
+    historico.unshift({
+      id: Date.now(),
+      paciente: document.getElementById('inpPaciente').value || 'Paciente não informado',
+      data,
+      agenda: document.getElementById('inpAgenda').value || 'Não informada',
+      servicoId,
+      servico: servico.nome,
+      sessoes,
+      valorSessao,
+      total: sessoes * valorSessao,
+      salvoEm: new Date().toISOString()
+    });
+
+    salvarHistorico(historico);
+    renderizarHistorico(historico[0].id);
+  }
+
+  function renderizarHistoricoEmCartoes() {
+    const lista = document.getElementById('listaHistorico');
+    const btnLimpar = document.getElementById('btnLimparHistorico');
+    const historico = obterHistorico();
+
+    btnLimpar.hidden = historico.length === 0;
+
+    if (historico.length === 0) {
+      lista.innerHTML = '<p class="history-empty">Nenhuma proposta salva ainda.</p>';
+      return;
+    }
+
+    lista.innerHTML = historico.map(item => {
+      const id = Number(item.id);
+      const paciente = escaparHtml(item.paciente);
+      const servico = escaparHtml(item.servico);
+      const data = escaparHtml(formatarData(item.data));
+      const total = escaparHtml(formatarValor(item.total));
+
+      return `
+        <div class="history-item">
+          <button type="button" class="history-load" onclick="carregarProposta(${id})" title="Carregar proposta">
+            <span class="history-name">${paciente}</span>
+            <span class="history-meta">${servico} · ${data} · ${total}</span>
+          </button>
+          <button type="button" class="history-pdf" onclick="gerarPdfProposta(${id})" aria-label="Gerar PDF da proposta" title="Gerar PDF">PDF</button>
+          <button type="button" class="history-delete" onclick="excluirProposta(${id})" aria-label="Excluir proposta" title="Excluir proposta">×</button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderizarHistorico(idSelecionado) {
+    const seletor = document.getElementById('selectHistorico');
+    const btnLimpar = document.getElementById('btnLimparHistorico');
+    const historico = obterHistorico();
+    const valorAtual = String(idSelecionado || seletor.value || '');
+
+    seletor.innerHTML = '';
+    btnLimpar.hidden = historico.length === 0;
+
+    const opcaoInicial = document.createElement('option');
+    opcaoInicial.value = '';
+    opcaoInicial.textContent = historico.length === 0 ? 'Nenhuma proposta salva' : 'Selecione uma proposta';
+    seletor.appendChild(opcaoInicial);
+
+    historico.forEach(proposta => {
+      const opcao = document.createElement('option');
+      opcao.value = proposta.id;
+      opcao.textContent = `${proposta.paciente || 'Paciente não informado'} - ${proposta.servico || 'Serviço'} - ${formatarData(proposta.data)} - ${formatarValor(proposta.total)}`;
+      seletor.appendChild(opcao);
+    });
+
+    seletor.disabled = historico.length === 0;
+    if (historico.some(proposta => String(proposta.id) === valorAtual)) {
+      seletor.value = valorAtual;
+    }
+
+    atualizarAcoesHistorico();
+  }
+
+  function atualizarAcoesHistorico() {
+    const id = document.getElementById('selectHistorico').value;
+    const possuiSelecao = Boolean(id);
+    document.getElementById('btnPdfHistorico').disabled = !possuiSelecao;
+    document.getElementById('btnExcluirHistorico').disabled = !possuiSelecao;
+  }
+
+  function selecionarPropostaHistorico() {
+    const id = document.getElementById('selectHistorico').value;
+    if (id) carregarProposta(id);
+    atualizarAcoesHistorico();
+  }
+
+  function gerarPdfSelecionado() {
+    const id = document.getElementById('selectHistorico').value;
+    if (id) gerarPdfProposta(id);
+  }
+
+  function excluirPropostaSelecionada() {
+    const id = document.getElementById('selectHistorico').value;
+    if (id) excluirProposta(id);
+  }
+
+  function carregarProposta(id) {
+    const proposta = obterHistorico().find(item => Number(item.id) === Number(id));
+    if (!proposta) return;
+
+    document.getElementById('inpPaciente').value = proposta.paciente || '';
+    document.getElementById('inpData').value = proposta.data || '';
+    document.getElementById('inpServico').value = proposta.servicoId || '';
+    document.getElementById('inpAgenda').value = proposta.agenda || '';
+    document.getElementById('inpSessoes').value = proposta.sessoes || 1;
+    document.getElementById('inpValorSessao').value = proposta.valorSessao || 0;
+    atualizarPreview();
+  }
+
+  function excluirProposta(id) {
+    salvarHistorico(obterHistorico().filter(item => Number(item.id) !== Number(id)));
+    renderizarHistorico();
+  }
+
+  function gerarPdfProposta(id) {
+    const proposta = obterHistorico().find(item => Number(item.id) === Number(id));
+    if (!proposta) return;
+    baixarPdfProposta(proposta);
+  }
+
+  function limparHistorico() {
+    if (!confirm('Limpar todas as propostas salvas?')) return;
+    localStorage.removeItem(CHAVE_HISTORICO_PROPOSTAS);
+    renderizarHistorico();
+  }
+
+  carregarServicosPersonalizados();
+
+  // Inicializa a data atual no input
+  document.getElementById('inpData').valueAsDate = new Date();
+
+  // Carrega lista de serviços no SELECT
+  const selectServico = document.getElementById('inpServico');
+  atualizarOpcoesServicos();
+
+  function selecionarServico() {
+    atualizarPreview();
+  }
+
+  function atualizarPreview() {
+    const paciente = document.getElementById('inpPaciente').value || "—";
+    const dataVal = document.getElementById('inpData').value;
+    const agenda = document.getElementById('inpAgenda').value || "—";
+    const sessoes = parseInt(document.getElementById('inpSessoes').value) || 1;
+    const valorSessao = parseFloat(document.getElementById('inpValorSessao').value) || 0;
+    const servicoId = document.getElementById('inpServico').value;
+
+    const servicoSelecionado = catalogos.find(s => s.id === servicoId);
+
+    // Formatação da data para dd/mm/aaaa
+    let dataFormatada = "—";
+    if (dataVal) {
+      const partes = dataVal.split('-');
+      dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+
+    // Atualiza tabela
+    document.getElementById('outPaciente').innerText = paciente;
+    document.getElementById('outData').innerText = dataFormatada;
+    document.getElementById('outServico').innerText = servicoSelecionado.nome;
+    document.getElementById('outAgenda').innerText = agenda;
+
+    // Atualiza Plano de Atendimento
+    document.getElementById('outHeaderPlano').innerText = `PLANO DE ATENDIMENTO (${sessoes} SESSÃO/ÕES)`;
+    
+    const listaPlano = document.getElementById('outListaPlano');
+    listaPlano.innerHTML = `
+      <li><strong>Procedimento:</strong> ${servicoSelecionado.nome} - ${servicoSelecionado.descricao}</li>
+      <li><strong>Conduta e Estratégia:</strong> ${servicoSelecionado.estrategia}</li>
+      <li><strong>Atendimento Domiciliar:</strong> Conforto e segurança no seu espaço, com material esterilizado e conduta individualizada.</li>
+    `;
+
+    if (servicoId !== "drenagem_pos_operatoria") {
+      listaPlano.lastElementChild.remove();
+    }
+
+    document.getElementById('outHeaderPlano').innerText = `PLANO DE ATENDIMENTO RESUMIDO (${sessoes} ${sessoes === 1 ? 'SESSÃO' : 'SESSÕES'})`;
+
+    const autorizacaoMedica = document.querySelectorAll('.section-box')[1].querySelectorAll('li')[1];
+    autorizacaoMedica.hidden = servicoId !== "drenagem_pos_operatoria";
+
+    const deslocamento = document.querySelectorAll('.section-box')[1].querySelectorAll('li')[0];
+    deslocamento.hidden = servicoId !== "drenagem_pos_operatoria";
+
+    // Atualiza Valores
+    const total = sessoes * valorSessao;
+    document.getElementById('outValorTotal').innerText = total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    document.getElementById('outValorDetalhe').innerText = `(${sessoes} sessão/ões de ${valorSessao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })})`;
+  }
+
+  // Primeira execução ao carregar
+  atualizarPreview();
+  renderizarHistorico();
+</script>
+
+</body>
+</html>
