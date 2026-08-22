@@ -153,6 +153,54 @@
       margin-top: 8px;
     }
 
+    .selected-procedures {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 12px;
+      margin-top: 10px;
+    }
+
+    .procedure-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      max-width: 100%;
+      background: #f4f1ea;
+      border: 1px solid var(--border-color);
+      color: var(--primary-color);
+      border-radius: 999px;
+      padding: 5px 8px 5px 10px;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .procedure-tag span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .procedure-tag button {
+      flex: 0 0 auto;
+      width: 18px;
+      height: 18px;
+      border: 0;
+      border-radius: 50%;
+      background: #e8ded1;
+      color: #765739;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .procedure-help {
+      color: #777;
+      font-size: 0.72rem;
+      line-height: 1.35;
+      margin-top: 7px;
+    }
+
     .custom-service-form {
       margin-top: 10px;
       padding: 12px;
@@ -541,10 +589,13 @@
     </div>
 
     <div class="form-group">
-      <label>Serviço</label>
+      <label>Adicionar procedimento</label>
       <select id="inpServico" onchange="selecionarServico()">
         <!-- Preenchido via JS -->
       </select>
+      <button type="button" class="btn-add-service" onclick="adicionarProcedimentoSelecionado()">+ Adicionar à proposta</button>
+      <div class="selected-procedures" id="listaServicosSelecionados"></div>
+      <p class="procedure-help">Selecione um procedimento e adicione-o à proposta. Você pode incluir mais de um.</p>
       <button type="button" class="btn-add-service" onclick="alternarFormularioServico()">+ Adicionar serviço</button>
 
       <div class="custom-service-form" id="formNovoServico" hidden>
@@ -622,7 +673,7 @@
         <td id="outData">05/08/2026</td>
       </tr>
       <tr>
-        <td class="label">Serviço:</td>
+        <td class="label">Procedimentos:</td>
         <td id="outServico">Drenagem Linfática</td>
       </tr>
       <tr>
@@ -726,6 +777,8 @@
     }
   ];
 
+  let servicosSelecionadosIds = [];
+
   const CHAVE_HISTORICO_PROPOSTAS = 'clauEstetica.propostasEnviadas';
 
   function obterHistorico() {
@@ -782,6 +835,50 @@
     }
   }
 
+  function obterServicosSelecionados() {
+    return servicosSelecionadosIds
+      .map(id => catalogos.find(servico => servico.id === id))
+      .filter(Boolean);
+  }
+
+  function renderizarServicosSelecionados() {
+    const lista = document.getElementById('listaServicosSelecionados');
+    const servicos = obterServicosSelecionados();
+
+    lista.innerHTML = servicos.map(servico => `
+      <div class="procedure-tag" title="${escaparHtml(servico.nome)}">
+        <span>${escaparHtml(servico.nome)}</span>
+        <button type="button" onclick="removerProcedimentoSelecionado('${servico.id}')" aria-label="Remover ${escaparHtml(servico.nome)}" title="Remover procedimento">×</button>
+      </div>
+    `).join('');
+  }
+
+  function adicionarProcedimentoSelecionado(id) {
+    const idProcedimento = id || selectServico.value;
+    if (!idProcedimento || !catalogos.some(servico => servico.id === idProcedimento)) return;
+
+    if (servicosSelecionadosIds.includes(idProcedimento)) {
+      alert('Este procedimento já foi incluído na proposta.');
+      return;
+    }
+
+    servicosSelecionadosIds.push(idProcedimento);
+    selectServico.value = idProcedimento;
+    renderizarServicosSelecionados();
+    atualizarPreview();
+  }
+
+  function removerProcedimentoSelecionado(id) {
+    if (servicosSelecionadosIds.length === 1) {
+      alert('A proposta deve ter ao menos um procedimento.');
+      return;
+    }
+
+    servicosSelecionadosIds = servicosSelecionadosIds.filter(servicoId => servicoId !== id);
+    renderizarServicosSelecionados();
+    atualizarPreview();
+  }
+
   function alternarFormularioServico() {
     const formulario = document.getElementById('formNovoServico');
     formulario.hidden = !formulario.hidden;
@@ -815,12 +912,12 @@
     localStorage.setItem(CHAVE_SERVICOS_PERSONALIZADOS, JSON.stringify(servicosPersonalizados));
     catalogos.push(novoServico);
     atualizarOpcoesServicos(novoServico.id);
+    adicionarProcedimentoSelecionado(novoServico.id);
 
     document.getElementById('inpNovoServicoNome').value = '';
     document.getElementById('inpNovoServicoDescricao').value = '';
     document.getElementById('inpNovoServicoEstrategia').value = '';
     document.getElementById('formNovoServico').hidden = true;
-    atualizarPreview();
   }
 
   function escaparHtml(texto) {
@@ -914,12 +1011,17 @@
       return linhas.length * (tamanho + 3);
     };
 
-    const dadosServico = catalogos.find(item => item.id === proposta.servicoId) || {};
+    const idsServicos = Array.isArray(proposta.servicoIds)
+      ? proposta.servicoIds
+      : (proposta.servicoId ? [proposta.servicoId] : []);
+    const dadosServicos = idsServicos
+      .map(id => catalogos.find(item => item.id === id))
+      .filter(Boolean);
     const sessoes = Number(proposta.sessoes) || 1;
     const valorSessao = Number(proposta.valorSessao) || 0;
     const total = Number(proposta.total ?? (sessoes * valorSessao));
-    const ePosOperatorio = proposta.servicoId === 'drenagem_pos_operatoria';
-    const nomeServico = proposta.servico || dadosServico.nome || 'Serviço não informado';
+    const ePosOperatorio = idsServicos.includes('drenagem_pos_operatoria');
+    const nomesServicos = proposta.servicos || proposta.servico || dadosServicos.map(servico => servico.nome).join(' • ') || 'Serviço não informado';
 
     adicionarTexto('Clau Estética', 224, 47, 20, false, '#A37547');
     adicionarTexto('ENFERMEIRA', 264, 64, 7, false, '#777777');
@@ -927,31 +1029,36 @@
     adicionarTexto('PROPOSTA DE ATENDIMENTO', 196, 106, 12, true, '#A37547');
 
     const topoTabela = 124;
-    const alturaLinha = 24;
     const linhasDados = [
       ['PACIENTE:', proposta.paciente || 'Paciente não informado'],
       ['DATA:', formatarData(proposta.data)],
-      ['SERVIÇO:', nomeServico],
+      ['PROCEDIMENTOS:', nomesServicos],
       ['AGENDA:', proposta.agenda || 'Não informada']
     ];
+    const alturasLinhas = linhasDados.map((linha, indice) => {
+      const totalLinhas = quebrarTextoPdf(linha[1], 8, 375).length;
+      return Math.max(24, 10 + (totalLinhas * 11) + (indice === 2 ? 2 : 0));
+    });
+    const alturaTabela = alturasLinhas.reduce((soma, altura) => soma + altura, 0);
 
-    adicionarRetangulo(45, topoTabela, 505, alturaLinha * linhasDados.length, '#FFFFFF', '#D1C7BD');
-    adicionarLinha(150, topoTabela, 150, topoTabela + (alturaLinha * linhasDados.length), '#D1C7BD', 0.7);
+    adicionarRetangulo(45, topoTabela, 505, alturaTabela, '#FFFFFF', '#D1C7BD');
+    adicionarLinha(150, topoTabela, 150, topoTabela + alturaTabela, '#D1C7BD', 0.7);
+    let topoLinhaTabela = topoTabela;
     linhasDados.forEach((linha, indice) => {
-      const y = topoTabela + 16 + (indice * alturaLinha);
-      if (indice > 0) adicionarLinha(45, topoTabela + (indice * alturaLinha), 550, topoTabela + (indice * alturaLinha), '#D1C7BD', 0.7);
-      adicionarTexto(linha[0], 55, y, 8, true, '#A37547');
-      adicionarTextoQuebrado(linha[1], 160, y, 375, 8, false, '#4A4A4A');
+      if (indice > 0) adicionarLinha(45, topoLinhaTabela, 550, topoLinhaTabela, '#D1C7BD', 0.7);
+      adicionarTexto(linha[0], 55, topoLinhaTabela + 16, 8, true, '#A37547');
+      adicionarTextoQuebrado(linha[1], 160, topoLinhaTabela + 16, 375, 8, false, '#4A4A4A');
+      topoLinhaTabela += alturasLinhas[indice];
     });
 
-    let topoAtual = topoTabela + (alturaLinha * linhasDados.length) + 35;
+    let topoAtual = topoTabela + alturaTabela + 35;
     adicionarTexto(`PLANO DE ATENDIMENTO RESUMIDO (${sessoes} ${sessoes === 1 ? 'SESSÃO' : 'SESSÕES'})`, 45, topoAtual, 10, true, '#A37547');
     topoAtual += 14;
 
-    const itensPlano = [
-      `• Procedimento: ${nomeServico} - ${dadosServico.descricao || ''}`,
-      `• Conduta e Estratégia: ${dadosServico.estrategia || ''}`
-    ];
+    const itensPlano = dadosServicos.flatMap(servico => [
+      `• Procedimento: ${servico.nome} - ${servico.descricao || ''}`,
+      `• Conduta e Estratégia: ${servico.estrategia || ''}`
+    ]);
     if (ePosOperatorio) itensPlano.push('• Atendimento Domiciliar: Conforto e segurança no seu espaço, com material esterilizado e conduta individualizada.');
 
     const linhasPlano = itensPlano.flatMap(item => quebrarTextoPdf(item, 8.5, 465));
@@ -1023,45 +1130,43 @@
     window.setTimeout(() => URL.revokeObjectURL(link.href), 1000);
   }
 
-  function gerarPdfAtual() {
-    const servicoId = document.getElementById('inpServico').value;
-    const servico = catalogos.find(item => item.id === servicoId);
-    if (!servico) return;
-
+  function obterDadosPropostaAtual() {
+    const servicos = obterServicosSelecionados();
+    if (servicos.length === 0) return null;
     const sessoes = parseInt(document.getElementById('inpSessoes').value) || 1;
     const valorSessao = parseFloat(document.getElementById('inpValorSessao').value) || 0;
-    baixarPdfProposta({
+    return {
       paciente: document.getElementById('inpPaciente').value || 'Paciente não informado',
       data: document.getElementById('inpData').value,
       agenda: document.getElementById('inpAgenda').value || 'Não informada',
-      servicoId,
-      servico: servico.nome,
+      servicoIds: servicos.map(servico => servico.id),
+      servicos: servicos.map(servico => servico.nome).join(' • '),
       sessoes,
       valorSessao,
       total: sessoes * valorSessao
-    });
+    };
+  }
+
+  function gerarPdfAtual() {
+    const proposta = obterDadosPropostaAtual();
+    if (!proposta) {
+      alert('Adicione ao menos um procedimento à proposta.');
+      return;
+    }
+    baixarPdfProposta(proposta);
   }
 
   function salvarProposta() {
-    const servicoId = document.getElementById('inpServico').value;
-    const servico = catalogos.find(item => item.id === servicoId);
-    if (!servico) return;
-
-    const sessoes = parseInt(document.getElementById('inpSessoes').value) || 1;
-    const valorSessao = parseFloat(document.getElementById('inpValorSessao').value) || 0;
-    const data = document.getElementById('inpData').value;
+    const proposta = obterDadosPropostaAtual();
+    if (!proposta) {
+      alert('Adicione ao menos um procedimento à proposta.');
+      return;
+    }
     const historico = obterHistorico();
 
     historico.unshift({
       id: Date.now(),
-      paciente: document.getElementById('inpPaciente').value || 'Paciente não informado',
-      data,
-      agenda: document.getElementById('inpAgenda').value || 'Não informada',
-      servicoId,
-      servico: servico.nome,
-      sessoes,
-      valorSessao,
-      total: sessoes * valorSessao,
+      ...proposta,
       salvoEm: new Date().toISOString()
     });
 
@@ -1118,7 +1223,7 @@
     historico.forEach(proposta => {
       const opcao = document.createElement('option');
       opcao.value = proposta.id;
-      opcao.textContent = `${proposta.paciente || 'Paciente não informado'} - ${proposta.servico || 'Serviço'} - ${formatarData(proposta.data)} - ${formatarValor(proposta.total)}`;
+      opcao.textContent = `${proposta.paciente || 'Paciente não informado'} - ${proposta.servicos || proposta.servico || 'Serviço'} - ${formatarData(proposta.data)} - ${formatarValor(proposta.total)}`;
       seletor.appendChild(opcao);
     });
 
@@ -1159,7 +1264,15 @@
 
     document.getElementById('inpPaciente').value = proposta.paciente || '';
     document.getElementById('inpData').value = proposta.data || '';
-    document.getElementById('inpServico').value = proposta.servicoId || '';
+    const idsSalvos = Array.isArray(proposta.servicoIds)
+      ? proposta.servicoIds
+      : (proposta.servicoId ? [proposta.servicoId] : []);
+    servicosSelecionadosIds = idsSalvos.filter(id => catalogos.some(servico => servico.id === id));
+    if (servicosSelecionadosIds.length === 0 && selectServico.value) {
+      servicosSelecionadosIds = [selectServico.value];
+    }
+    selectServico.value = servicosSelecionadosIds[0] || '';
+    renderizarServicosSelecionados();
     document.getElementById('inpAgenda').value = proposta.agenda || '';
     document.getElementById('inpSessoes').value = proposta.sessoes || 1;
     document.getElementById('inpValorSessao').value = proposta.valorSessao || 0;
@@ -1191,9 +1304,11 @@
   // Carrega lista de serviços no SELECT
   const selectServico = document.getElementById('inpServico');
   atualizarOpcoesServicos();
+  servicosSelecionadosIds = selectServico.value ? [selectServico.value] : [];
+  renderizarServicosSelecionados();
 
   function selecionarServico() {
-    atualizarPreview();
+    // O procedimento só entra na proposta após clicar em “Adicionar à proposta”.
   }
 
   function atualizarPreview() {
@@ -1202,9 +1317,8 @@
     const agenda = document.getElementById('inpAgenda').value || "—";
     const sessoes = parseInt(document.getElementById('inpSessoes').value) || 1;
     const valorSessao = parseFloat(document.getElementById('inpValorSessao').value) || 0;
-    const servicoId = document.getElementById('inpServico').value;
-
-    const servicoSelecionado = catalogos.find(s => s.id === servicoId);
+    const servicosSelecionados = obterServicosSelecionados();
+    const temDrenagemPosOperatoria = servicosSelecionados.some(servico => servico.id === 'drenagem_pos_operatoria');
 
     // Formatação da data para dd/mm/aaaa
     let dataFormatada = "—";
@@ -1216,30 +1330,25 @@
     // Atualiza tabela
     document.getElementById('outPaciente').innerText = paciente;
     document.getElementById('outData').innerText = dataFormatada;
-    document.getElementById('outServico').innerText = servicoSelecionado.nome;
+    document.getElementById('outServico').innerText = servicosSelecionados.map(servico => servico.nome).join(' • ') || '—';
     document.getElementById('outAgenda').innerText = agenda;
 
     // Atualiza Plano de Atendimento
-    document.getElementById('outHeaderPlano').innerText = `PLANO DE ATENDIMENTO (${sessoes} SESSÃO/ÕES)`;
-    
     const listaPlano = document.getElementById('outListaPlano');
-    listaPlano.innerHTML = `
-      <li><strong>Procedimento:</strong> ${servicoSelecionado.nome} - ${servicoSelecionado.descricao}</li>
-      <li><strong>Conduta e Estratégia:</strong> ${servicoSelecionado.estrategia}</li>
-      <li><strong>Atendimento Domiciliar:</strong> Conforto e segurança no seu espaço, com material esterilizado e conduta individualizada.</li>
-    `;
-
-    if (servicoId !== "drenagem_pos_operatoria") {
-      listaPlano.lastElementChild.remove();
-    }
+    listaPlano.innerHTML = servicosSelecionados.map(servico => `
+      <li><strong>Procedimento:</strong> ${escaparHtml(servico.nome)} - ${escaparHtml(servico.descricao)}</li>
+      <li><strong>Conduta e Estratégia:</strong> ${escaparHtml(servico.estrategia)}</li>
+    `).join('') + (temDrenagemPosOperatoria
+      ? '<li><strong>Atendimento Domiciliar:</strong> Conforto e segurança no seu espaço, com material esterilizado e conduta individualizada.</li>'
+      : '');
 
     document.getElementById('outHeaderPlano').innerText = `PLANO DE ATENDIMENTO RESUMIDO (${sessoes} ${sessoes === 1 ? 'SESSÃO' : 'SESSÕES'})`;
 
     const autorizacaoMedica = document.querySelectorAll('.section-box')[1].querySelectorAll('li')[1];
-    autorizacaoMedica.hidden = servicoId !== "drenagem_pos_operatoria";
+    autorizacaoMedica.hidden = !temDrenagemPosOperatoria;
 
     const deslocamento = document.querySelectorAll('.section-box')[1].querySelectorAll('li')[0];
-    deslocamento.hidden = servicoId !== "drenagem_pos_operatoria";
+    deslocamento.hidden = !temDrenagemPosOperatoria;
 
     // Atualiza Valores
     const total = sessoes * valorSessao;
