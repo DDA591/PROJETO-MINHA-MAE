@@ -177,7 +177,7 @@
         <h2 class="text-3xl sm:text-4xl md:text-5xl font-serif font-bold titulo-secao mt-2">Gerenciamento da Agenda</h2>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div class="bg-white/95 backdrop-blur-sm p-5 sm:p-8 rounded-2xl border border-amber-200/60 shadow-md">
           <h3 class="font-serif text-2xl font-bold mb-6 text-neutral-900">Novo Agendamento</h3>
           <form id="form-agendamento" class="space-y-5">
@@ -212,7 +212,7 @@
           </form>
         </div>
 
-        <div class="lg:col-span-2 bg-white/95 backdrop-blur-sm p-5 sm:p-8 rounded-2xl border border-amber-200/60 shadow-md overflow-hidden">
+        <div class="bg-white/95 backdrop-blur-sm p-5 sm:p-8 rounded-2xl border border-amber-200/60 shadow-md overflow-hidden">
           <h3 class="font-serif text-2xl font-bold mb-6 text-neutral-900">Agendamentos Pendentes</h3>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-sm sm:text-base min-w-[600px]">
@@ -491,11 +491,11 @@
       <div>
         <span class="text-xs font-extrabold tracking-widest uppercase bg-black/10 text-neutral-900 px-3 py-1 rounded-full">Propostas</span>
         <h2 class="text-3xl sm:text-4xl md:text-5xl font-serif font-bold titulo-secao mt-2">Gerador de Orçamentos</h2>
-        <p class="text-sm sm:text-base text-neutral-900 mt-2 font-semibold">Crie, salve e gere PDFs das suas propostas de atendimento.</p>
+        <p class="text-sm sm:text-base text-neutral-900 mt-2 font-semibold">Crie propostas com um ou mais procedimentos, salve o histórico e gere PDFs.</p>
       </div>
 
       <div class="bg-white/95 backdrop-blur-sm p-2 sm:p-4 rounded-2xl border border-amber-200/60 shadow-md overflow-hidden">
-        <iframe class="orcamentos-frame" src="orcamento-atualizado.html" title="Gerador de Orçamentos"></iframe>
+        <iframe class="orcamentos-frame" src="./orcamento-atualizado.html" title="Gerador de Orçamentos"></iframe>
       </div>
     </div>
 
@@ -549,6 +549,20 @@
         </button>
       </div>
       <button onclick="fecharModalPaciente()" class="w-full mt-6 py-3 text-xs font-bold text-neutral-500 uppercase tracking-wider hover:text-neutral-800">Cancelar</button>
+    </div>
+  </div>
+
+  <div id="modal-anamnese" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl p-6 sm:p-8 max-w-2xl w-full shadow-2xl border border-amber-200/60 max-h-[85vh] flex flex-col">
+      <div class="flex justify-between items-start gap-4 mb-4 border-b pb-3">
+        <div>
+          <h3 id="anamnese-paciente-nome" class="font-serif text-2xl font-bold text-neutral-900">Anamnese</h3>
+          <p class="text-xs text-gold-500 font-bold uppercase tracking-wider mt-0.5">Histórico clínico do paciente</p>
+        </div>
+        <button type="button" onclick="fecharModalAnamnese()" class="text-neutral-400 hover:text-neutral-800 text-xl font-bold" aria-label="Fechar anamnese">✕</button>
+      </div>
+      <div id="anamnese-conteudo" class="flex-1 overflow-y-auto whitespace-pre-wrap rounded-xl bg-neutral-50 border border-neutral-200 p-4 text-sm leading-relaxed text-neutral-700"></div>
+      <button type="button" onclick="fecharModalAnamnese()" class="w-full mt-5 py-3 bg-neutral-900 text-white rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-neutral-800">Fechar</button>
     </div>
   </div>
 
@@ -689,6 +703,20 @@
     function fecharModalPaciente() {
       document.getElementById('modal-paciente').classList.add('hidden');
       pacienteSelecionadoId = null;
+    }
+
+    function verAnamnese(id) {
+      const paciente = db.clientes.find(item => item.id == id);
+      if (!paciente) return;
+
+      document.getElementById('anamnese-paciente-nome').innerText = `Anamnese de ${paciente.nome}`;
+      const conteudo = String(paciente.prontuario || 'Nenhuma anamnese registrada para esta paciente.');
+      document.getElementById('anamnese-conteudo').textContent = conteudo.replace(/<[^>]*>/g, '');
+      document.getElementById('modal-anamnese').classList.remove('hidden');
+    }
+
+    function fecharModalAnamnese() {
+      document.getElementById('modal-anamnese').classList.add('hidden');
     }
 
     function executarAcaoModal(tipo) {
@@ -1303,9 +1331,9 @@
           <div class="py-4 hover:bg-bege-100 px-3 rounded-xl transition flex justify-between items-center group">
             <div onclick="abrirModalPaciente(${c.id})" class="cursor-pointer flex-1">
               <p class="font-bold text-base text-neutral-900 group-hover:text-gold-500 transition">${c.nome} <span class="text-sm font-normal text-neutral-500 block sm:inline">(${c.telefone})</span></p>
-              <div class="text-sm text-neutral-600 mt-1 whitespace-pre-wrap">${c.prontuario || 'Sem observações cadastradas'}</div>
             </div>
             <div class="flex items-center gap-2">
+              <button onclick="verAnamnese(${c.id})" class="text-xs text-neutral-700 font-bold border border-neutral-300 hover:border-gold-400 hover:text-gold-500 px-2.5 py-1.5 rounded-lg">Ver anamnese</button>
               <button onclick="abrirModalPaciente(${c.id})" class="text-xs text-gold-500 font-bold hover:underline px-2 py-1">Opções →</button>
             </div>
           </div>`).join('')
